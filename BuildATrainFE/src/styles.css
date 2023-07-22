@@ -9,7 +9,7 @@
   box-sizing: border-box;
 }
 
-body, html {
+#loginBody,#loginHtml {
   width: 100%;
   height: 100%;
   margin: 0;
@@ -51,4 +51,11 @@ body, html {
 
 .btn-login:hover {
   background: rgba(42, 117, 243, 0.7);
+}
+
+#canvas
+{
+  margin-left: 10%;
+  margin-top: 5%;
+
 }
