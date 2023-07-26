@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Build-A-Train!</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="scripts/game.js" async defer></script>
   </head>
   <body>
     <main>
@@ -33,37 +34,39 @@
 
       <section class="game-grid"></section>
 
+      <article class="game-stats">
+
+        <figure>
+          <img src="images/money.svg" alt="Money">
+          <figcaption id="money-total">0</figcaption>
+        </figure>
+
+        <figure>
+          <img src="images/fuel.svg" alt="Fuel">
+          <figcaption id="fuel-total">0</figcaption>
+        </figure>
+
+        <figure>
+          <img src="images/income.svg" alt="Income">
+          <figcaption id="income">0/km</figcaption>
+        </figure>
+
+        <figure>
+          <img src="images/fuel-consumption.svg" alt="Fuel consumption">
+          <figcaption id="fuel-consumption">0/km</figcaption>
+        </figure>
+
+      </article>
+
       <section class="game-controls">
 
-        <article class="game-stats">
-
-          <figure>
-            <img src="images/money.svg" alt="Money">
-            <figcaption>0</figcaption>
-          </figure>
-
-          <figure>
-            <img src="images/fuel.svg" alt="Fuel">
-            <figcaption>0</figcaption>
-          </figure>
-
-          <figure>
-            <img src="images/income.svg" alt="Income">
-            <figcaption>0/km</figcaption>
-          </figure>
-
-          <figure>
-            <img src="images/fuel-consumption.svg" alt="Fuel consumption">
-            <figcaption>0/km</figcaption>
-          </figure>
-
-        </article>
-
-        <button type="button" class="btn-game">Purchase Passenger Car</button>
-        <button type="button" class="btn-game">Purchase Cargo Car</button>
-        <button type="button" class="btn-game">Purchase Fuel Car</button>
-        <button type="button" class="btn-game">Upgrade Locomotive</button>
-        <button type="button" class="btn-game">Restart</button>
+        <button type="button" class="btn-game" onclick="purchasePassenger()">Purchase Passenger Car</button>
+        <button type="button" class="btn-game" onclick="purchaseCargo()">Purchase Cargo Car</button>
+        <button type="button" class="btn-game" onclick="purchaseFuel()">Purchase Fuel Car</button>
+        <select class="btn-game" id="train-select">
+          
+        </select>
+        <button type="button" class="btn-game">Reset</button>
 
       </section>
     </main>

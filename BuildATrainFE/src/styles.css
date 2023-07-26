@@ -68,9 +68,11 @@ body, html {
 }
 
 .game-controls {
+  width: 100%;
   display: flex;
   margin-top: auto;
   justify-content: center;
+  flex-wrap: wrap;
 }
 
 .info-bar {
@@ -97,10 +99,14 @@ body, html {
   grid-template-columns: 1fr 1fr;
   background: rgba(66, 133, 244, 1);
   color: #fff;
-  padding: 10px;
+  padding: 5px;
   text-decoration: none;
   border-radius: 5px; 
   border: 2px solid black;
+
+  @media screen and (min-width: 780px) {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+  }
 }
 
 .game-stats figure {

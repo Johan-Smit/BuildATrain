@@ -5,6 +5,14 @@ import GoogleStrategy from 'passport-google-oauth20';
 import { Profile } from 'passport-google-oauth20';
 import dotenv from 'dotenv';
 
+declare module 'express-session' {
+  export interface SessionData {
+    token: string;
+    refresh: any;
+    profile: Profile;
+  }
+}
+
 dotenv.config();
 
 const app = express();
@@ -58,13 +66,19 @@ app.get(
   passport.authenticate('google', { failureRedirect: '/login' }),
   (req, res) => {
     // Successful authentication, redirect home.
-    res.redirect('/');
+    res.cookie('user', req.user);
+    res.redirect('/game');
   }
 );
 
 // Login route
 app.get('/login', (req, res) => {
   res.sendFile(__dirname + '/src/login.html');
+});
+
+// Game route
+app.get('/game', (req, res ) => {
+  res.sendFile(__dirname + '/src/game.html');
 });
 
 
