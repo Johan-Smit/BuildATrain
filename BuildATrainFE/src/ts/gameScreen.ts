@@ -23,16 +23,21 @@ let trTurn:CanvasImageSource;
 let brTurn:CanvasImageSource;
 
 let trainHead:CanvasImageSource;
-let trainScale: number = 0.4;
-// let grass:CanvasImageSource;
-// let grass:CanvasImageSource;
-// let grass:CanvasImageSource;
+let fuelCart:CanvasImageSource;
+let cargoCart:CanvasImageSource;
+let passangerCart:CanvasImageSource;
 
-
+let trainScale: number;
 let trainCurrPos:number = 0;
 let trainRoute: number[][] = [];
 let trainRouteSize:number;
 let trainSpeed:number =2;
+
+let cartScale:number = 0.45;
+let cartFollowingDistance:number;
+let distanceBetweenCarts:number;
+let locomotiveChoice: string = "medium";
+let cartsBought: CanvasImageSource[] = [];//Everytime a user buys a cart it must be added to this array
 
 
 //TODO: see how I autoresized canvas from prev project
@@ -65,7 +70,43 @@ async function loadAllImages()
     trTurn = await loadImage('./images/trainTracks/topRightTurn.png');
     brTurn = await loadImage('./images/trainTracks/bottomRightTurn.png');
 
-    trainHead = await loadImage('./images/trainParts/tankBody_bigRed_outline.png');
+    //TODO: User chooses the small/med/large locomotive option here
+    switch (locomotiveChoice) {
+        case "small":
+            trainHead = await loadImage('./images/trainParts/locomotiveSmall.png');
+            trainScale = 0.52;
+            cartFollowingDistance = 17;
+            distanceBetweenCarts = 16;
+            break;
+    
+        case "medium":
+            trainHead = await loadImage('./images/trainParts/locomotiveMedium.png');
+            trainScale = 0.55;
+            cartFollowingDistance = 20;
+            distanceBetweenCarts = 18;
+            
+            break;
+        
+        case "large":
+            trainHead = await loadImage('./images/trainParts/locomotiveLarge.png');
+            trainScale = 0.55;
+            cartFollowingDistance = 30;
+            distanceBetweenCarts = 23;
+            
+            break;
+    }
+
+    fuelCart = await loadImage('./images/trainParts/fuelCart.png');
+    cargoCart = await loadImage('./images/trainParts/cargoCart.png');
+    passangerCart = await loadImage('./images/trainParts/passangerCart.png');
+
+    cartsBought.push(fuelCart);
+    cartsBought.push(passangerCart);
+    cartsBought.push(cargoCart);
+
+    cartsBought.push(fuelCart);
+    cartsBought.push(passangerCart);
+    cartsBought.push(cargoCart);
 
 }
 
@@ -1296,62 +1337,62 @@ async function loadTrainRoute()
     trainRoute.push([686.1999999999989,95,1.4399999999999988]);
     trainRoute.push([687.1999999999989,94,1.4399999999999988]);
     trainRoute.push([688.1999999999989,93,1.4399999999999988]);
-    trainRoute.push([688,82,1.57]);
-    trainRoute.push([690,82,1.57]);
-    trainRoute.push([692,82,1.57]);
-    trainRoute.push([694,82,1.57]);
-    trainRoute.push([696,82,1.57]);
-    trainRoute.push([698,82,1.57]);
-    trainRoute.push([700,82,1.57]);
-    trainRoute.push([702,82,1.57]);
-    trainRoute.push([704,82,1.57]);
-    trainRoute.push([706,82,1.57]);
-    trainRoute.push([708,82,1.57]);
-    trainRoute.push([710,82,1.57]);
-    trainRoute.push([712,82,1.57]);
-    trainRoute.push([714,82,1.57]);
-    trainRoute.push([716,82,1.57]);
-    trainRoute.push([718,82,1.57]);
-    trainRoute.push([720,82,1.57]);
-    trainRoute.push([722,82,1.57]);
-    trainRoute.push([724,82,1.57]);
-    trainRoute.push([726,82,1.57]);
-    trainRoute.push([728,82,1.57]);
-    trainRoute.push([730,82,1.57]);
-    trainRoute.push([732,82,1.57]);
-    trainRoute.push([734,82,1.57]);
-    trainRoute.push([736,82,1.57]);
-    trainRoute.push([738,82,1.57]);
-    trainRoute.push([740,82,1.57]);
-    trainRoute.push([742,82,1.57]);
-    trainRoute.push([744,82,1.57]);
-    trainRoute.push([746,82,1.57]);
-    trainRoute.push([748,82,1.57]);
-    trainRoute.push([750,82,1.57]);
-    trainRoute.push([752,82,1.57]);
-    trainRoute.push([754,82,1.57]);
-    trainRoute.push([756,82,1.57]);
-    trainRoute.push([758,82,1.57]);
-    trainRoute.push([760,82,1.57]);
-    trainRoute.push([762,82,1.57]);
-    trainRoute.push([764,82,1.57]);
-    trainRoute.push([766,82,1.57]);
-    trainRoute.push([768,82,1.57]);
-    trainRoute.push([770,82,1.57]);
-    trainRoute.push([772,82,1.57]);
-    trainRoute.push([774,82,1.57]);
-    trainRoute.push([776,82,1.57]);
-    trainRoute.push([778,82,1.57]);
-    trainRoute.push([780,82,1.57]);
-    trainRoute.push([782,82,1.57]);
-    trainRoute.push([784,82,1.57]);
-    trainRoute.push([786,82,1.57]);
-    trainRoute.push([788,82,1.57]);
-    trainRoute.push([790,82,1.57]);
-    trainRoute.push([792,82,1.57]);
-    trainRoute.push([794,82,1.57]);
-    trainRoute.push([796,82,1.57]);
-    trainRoute.push([798,82,1.57]);
+    trainRoute.push([688,90,1.57]);
+    trainRoute.push([690,90,1.57]);
+    trainRoute.push([692,90,1.57]);
+    trainRoute.push([694,90,1.57]);
+    trainRoute.push([696,90,1.57]);
+    trainRoute.push([698,90,1.57]);
+    trainRoute.push([700,90,1.57]);
+    trainRoute.push([702,90,1.57]);
+    trainRoute.push([704,90,1.57]);
+    trainRoute.push([706,90,1.57]);
+    trainRoute.push([708,90,1.57]);
+    trainRoute.push([710,90,1.57]);
+    trainRoute.push([712,90,1.57]);
+    trainRoute.push([714,90,1.57]);
+    trainRoute.push([716,90,1.57]);
+    trainRoute.push([718,90,1.57]);
+    trainRoute.push([720,90,1.57]);
+    trainRoute.push([722,90,1.57]);
+    trainRoute.push([724,90,1.57]);
+    trainRoute.push([726,90,1.57]);
+    trainRoute.push([728,90,1.57]);
+    trainRoute.push([730,90,1.57]);
+    trainRoute.push([732,90,1.57]);
+    trainRoute.push([734,90,1.57]);
+    trainRoute.push([736,90,1.57]);
+    trainRoute.push([738,90,1.57]);
+    trainRoute.push([740,90,1.57]);
+    trainRoute.push([742,90,1.57]);
+    trainRoute.push([744,90,1.57]);
+    trainRoute.push([746,90,1.57]);
+    trainRoute.push([748,90,1.57]);
+    trainRoute.push([750,90,1.57]);
+    trainRoute.push([752,90,1.57]);
+    trainRoute.push([754,90,1.57]);
+    trainRoute.push([756,90,1.57]);
+    trainRoute.push([758,90,1.57]);
+    trainRoute.push([760,90,1.57]);
+    trainRoute.push([762,90,1.57]);
+    trainRoute.push([764,90,1.57]);
+    trainRoute.push([766,90,1.57]);
+    trainRoute.push([768,90,1.57]);
+    trainRoute.push([770,90,1.57]);
+    trainRoute.push([772,90,1.57]);
+    trainRoute.push([774,90,1.57]);
+    trainRoute.push([776,90,1.57]);
+    trainRoute.push([778,90,1.57]);
+    trainRoute.push([780,90,1.57]);
+    trainRoute.push([782,90,1.57]);
+    trainRoute.push([784,90,1.57]);
+    trainRoute.push([786,90,1.57]);
+    trainRoute.push([788,90,1.57]);
+    trainRoute.push([790,90,1.57]);
+    trainRoute.push([792,90,1.57]);
+    trainRoute.push([794,90,1.57]);
+    trainRoute.push([796,90,1.57]);
+    trainRoute.push([798,90,1.57]);
     trainRoute.push([0,0,3.14]);
     trainRoute.push([0,0,3.14]);
     trainRoute.push([0,0,3.14]);
@@ -1452,6 +1493,7 @@ async function loadTrainRoute()
     trainRoute.push([0,0,3.14]);
     trainRoute.push([0,0,3.14]);
     trainRoute.push([0,0,3.14]);
+    
     
     trainRouteSize = trainRoute.length;
 }
@@ -1663,12 +1705,34 @@ async function drawTrain() {
         trainCurrPos = 0;
         trainTimer = 0;
     }
-    console.log("TCP"+trainCurrPos);
     if(trainTimer % trainSpeed == 0)
     {
         trainCurrPos += 1; 
     }
+
     await drawImageRotated(trainHead,trainRoute[trainCurrPos][0],trainRoute[trainCurrPos][1],trainScale,trainRoute[trainCurrPos][2]);
+
+    let cart:CanvasImageSource;
+    let cartPosition:number;
+    for (let index = 0; index < cartsBought.length; index++) {
+        cart = cartsBought[index];
+        if(index == 0)
+        {
+            cartPosition = trainCurrPos - ((index+1)*cartFollowingDistance);
+
+        }
+        else
+        {
+            cartPosition = trainCurrPos - ((index+1)*distanceBetweenCarts);
+
+        }
+        if(cartPosition > 0)
+        {
+            drawImageRotated(cart,trainRoute[cartPosition][0],trainRoute[cartPosition][1],cartScale,trainRoute[cartPosition][2]);
+        }
+        
+    }
+
     trainTimer += 1;
 
 }

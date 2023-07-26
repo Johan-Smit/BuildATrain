@@ -56,14 +56,19 @@ var blTurn;
 var trTurn;
 var brTurn;
 var trainHead;
-var trainScale = 0.4;
-// let grass:CanvasImageSource;
-// let grass:CanvasImageSource;
-// let grass:CanvasImageSource;
+var fuelCart;
+var cargoCart;
+var passangerCart;
+var trainScale;
 var trainCurrPos = 0;
 var trainRoute = [];
 var trainRouteSize;
 var trainSpeed = 2;
+var cartScale = 0.45;
+var cartFollowingDistance;
+var distanceBetweenCarts;
+var locomotiveChoice = "medium";
+var cartsBought = []; //Everytime a user buys a cart it must be added to this array
 //TODO: see how I autoresized canvas from prev project
 function loadImage(url) {
     return new Promise(function (resolve, reject) {
@@ -77,50 +82,91 @@ function loadImage(url) {
 }
 function loadAllImages() {
     return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            switch (_a.label) {
+        var _a;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
                 case 0: return [4 /*yield*/, loadImage('./images/gameGrid/tileGrass1.png')];
                 case 1:
-                    grass = _a.sent();
+                    grass = _b.sent();
                     return [4 /*yield*/, loadImage('./images/gameGrid/tileGrass_transitionE.png')];
                 case 2:
-                    vertTrans = _a.sent();
+                    vertTrans = _b.sent();
                     return [4 /*yield*/, loadImage('./images/gameGrid/tileGrass_transitionW.png')];
                 case 3:
-                    vertTrans2 = _a.sent();
+                    vertTrans2 = _b.sent();
                     return [4 /*yield*/, loadImage('./images/gameGrid/tileSand1.png')];
                 case 4:
-                    sand = _a.sent();
+                    sand = _b.sent();
                     return [4 /*yield*/, loadImage('./images/gameGrid/tileGrass_transitionS.png')];
                 case 5:
-                    horzTrans = _a.sent();
+                    horzTrans = _b.sent();
                     return [4 /*yield*/, loadImage('./images/gameGrid/tileGrass_transitionN.png')];
                 case 6:
-                    horzTrans2 = _a.sent();
+                    horzTrans2 = _b.sent();
                     return [4 /*yield*/, loadImage('./images/gameGrid/treeBrown_large.png')];
                 case 7:
-                    treesB = _a.sent();
+                    treesB = _b.sent();
                     return [4 /*yield*/, loadImage('./images/trainTracks/horzTrack.png')];
                 case 8:
-                    horzTrack = _a.sent();
+                    horzTrack = _b.sent();
                     return [4 /*yield*/, loadImage('./images/trainTracks/vertTrack2.png')];
                 case 9:
-                    vertTrack = _a.sent();
+                    vertTrack = _b.sent();
                     return [4 /*yield*/, loadImage('./images/trainTracks/topLeftTurn.png')];
                 case 10:
-                    tlTurn = _a.sent();
+                    tlTurn = _b.sent();
                     return [4 /*yield*/, loadImage('./images/trainTracks/bottomLeftTurn.png')];
                 case 11:
-                    blTurn = _a.sent();
+                    blTurn = _b.sent();
                     return [4 /*yield*/, loadImage('./images/trainTracks/topRightTurn.png')];
                 case 12:
-                    trTurn = _a.sent();
+                    trTurn = _b.sent();
                     return [4 /*yield*/, loadImage('./images/trainTracks/bottomRightTurn.png')];
                 case 13:
-                    brTurn = _a.sent();
-                    return [4 /*yield*/, loadImage('./images/trainParts/tankBody_bigRed_outline.png')];
-                case 14:
-                    trainHead = _a.sent();
+                    brTurn = _b.sent();
+                    _a = locomotiveChoice;
+                    switch (_a) {
+                        case "small": return [3 /*break*/, 14];
+                        case "medium": return [3 /*break*/, 16];
+                        case "large": return [3 /*break*/, 18];
+                    }
+                    return [3 /*break*/, 20];
+                case 14: return [4 /*yield*/, loadImage('./images/trainParts/locomotiveSmall.png')];
+                case 15:
+                    trainHead = _b.sent();
+                    trainScale = 0.52;
+                    cartFollowingDistance = 17;
+                    distanceBetweenCarts = 16;
+                    return [3 /*break*/, 20];
+                case 16: return [4 /*yield*/, loadImage('./images/trainParts/locomotiveMedium.png')];
+                case 17:
+                    trainHead = _b.sent();
+                    trainScale = 0.55;
+                    cartFollowingDistance = 20;
+                    distanceBetweenCarts = 18;
+                    return [3 /*break*/, 20];
+                case 18: return [4 /*yield*/, loadImage('./images/trainParts/locomotiveLarge.png')];
+                case 19:
+                    trainHead = _b.sent();
+                    trainScale = 0.55;
+                    cartFollowingDistance = 30;
+                    distanceBetweenCarts = 23;
+                    return [3 /*break*/, 20];
+                case 20: return [4 /*yield*/, loadImage('./images/trainParts/fuelCart.png')];
+                case 21:
+                    fuelCart = _b.sent();
+                    return [4 /*yield*/, loadImage('./images/trainParts/cargoCart.png')];
+                case 22:
+                    cargoCart = _b.sent();
+                    return [4 /*yield*/, loadImage('./images/trainParts/passangerCart.png')];
+                case 23:
+                    passangerCart = _b.sent();
+                    cartsBought.push(fuelCart);
+                    cartsBought.push(passangerCart);
+                    cartsBought.push(cargoCart);
+                    cartsBought.push(fuelCart);
+                    cartsBought.push(passangerCart);
+                    cartsBought.push(cargoCart);
                     return [2 /*return*/];
             }
         });
@@ -1354,62 +1400,62 @@ function loadTrainRoute() {
             trainRoute.push([686.1999999999989, 95, 1.4399999999999988]);
             trainRoute.push([687.1999999999989, 94, 1.4399999999999988]);
             trainRoute.push([688.1999999999989, 93, 1.4399999999999988]);
-            trainRoute.push([688, 82, 1.57]);
-            trainRoute.push([690, 82, 1.57]);
-            trainRoute.push([692, 82, 1.57]);
-            trainRoute.push([694, 82, 1.57]);
-            trainRoute.push([696, 82, 1.57]);
-            trainRoute.push([698, 82, 1.57]);
-            trainRoute.push([700, 82, 1.57]);
-            trainRoute.push([702, 82, 1.57]);
-            trainRoute.push([704, 82, 1.57]);
-            trainRoute.push([706, 82, 1.57]);
-            trainRoute.push([708, 82, 1.57]);
-            trainRoute.push([710, 82, 1.57]);
-            trainRoute.push([712, 82, 1.57]);
-            trainRoute.push([714, 82, 1.57]);
-            trainRoute.push([716, 82, 1.57]);
-            trainRoute.push([718, 82, 1.57]);
-            trainRoute.push([720, 82, 1.57]);
-            trainRoute.push([722, 82, 1.57]);
-            trainRoute.push([724, 82, 1.57]);
-            trainRoute.push([726, 82, 1.57]);
-            trainRoute.push([728, 82, 1.57]);
-            trainRoute.push([730, 82, 1.57]);
-            trainRoute.push([732, 82, 1.57]);
-            trainRoute.push([734, 82, 1.57]);
-            trainRoute.push([736, 82, 1.57]);
-            trainRoute.push([738, 82, 1.57]);
-            trainRoute.push([740, 82, 1.57]);
-            trainRoute.push([742, 82, 1.57]);
-            trainRoute.push([744, 82, 1.57]);
-            trainRoute.push([746, 82, 1.57]);
-            trainRoute.push([748, 82, 1.57]);
-            trainRoute.push([750, 82, 1.57]);
-            trainRoute.push([752, 82, 1.57]);
-            trainRoute.push([754, 82, 1.57]);
-            trainRoute.push([756, 82, 1.57]);
-            trainRoute.push([758, 82, 1.57]);
-            trainRoute.push([760, 82, 1.57]);
-            trainRoute.push([762, 82, 1.57]);
-            trainRoute.push([764, 82, 1.57]);
-            trainRoute.push([766, 82, 1.57]);
-            trainRoute.push([768, 82, 1.57]);
-            trainRoute.push([770, 82, 1.57]);
-            trainRoute.push([772, 82, 1.57]);
-            trainRoute.push([774, 82, 1.57]);
-            trainRoute.push([776, 82, 1.57]);
-            trainRoute.push([778, 82, 1.57]);
-            trainRoute.push([780, 82, 1.57]);
-            trainRoute.push([782, 82, 1.57]);
-            trainRoute.push([784, 82, 1.57]);
-            trainRoute.push([786, 82, 1.57]);
-            trainRoute.push([788, 82, 1.57]);
-            trainRoute.push([790, 82, 1.57]);
-            trainRoute.push([792, 82, 1.57]);
-            trainRoute.push([794, 82, 1.57]);
-            trainRoute.push([796, 82, 1.57]);
-            trainRoute.push([798, 82, 1.57]);
+            trainRoute.push([688, 90, 1.57]);
+            trainRoute.push([690, 90, 1.57]);
+            trainRoute.push([692, 90, 1.57]);
+            trainRoute.push([694, 90, 1.57]);
+            trainRoute.push([696, 90, 1.57]);
+            trainRoute.push([698, 90, 1.57]);
+            trainRoute.push([700, 90, 1.57]);
+            trainRoute.push([702, 90, 1.57]);
+            trainRoute.push([704, 90, 1.57]);
+            trainRoute.push([706, 90, 1.57]);
+            trainRoute.push([708, 90, 1.57]);
+            trainRoute.push([710, 90, 1.57]);
+            trainRoute.push([712, 90, 1.57]);
+            trainRoute.push([714, 90, 1.57]);
+            trainRoute.push([716, 90, 1.57]);
+            trainRoute.push([718, 90, 1.57]);
+            trainRoute.push([720, 90, 1.57]);
+            trainRoute.push([722, 90, 1.57]);
+            trainRoute.push([724, 90, 1.57]);
+            trainRoute.push([726, 90, 1.57]);
+            trainRoute.push([728, 90, 1.57]);
+            trainRoute.push([730, 90, 1.57]);
+            trainRoute.push([732, 90, 1.57]);
+            trainRoute.push([734, 90, 1.57]);
+            trainRoute.push([736, 90, 1.57]);
+            trainRoute.push([738, 90, 1.57]);
+            trainRoute.push([740, 90, 1.57]);
+            trainRoute.push([742, 90, 1.57]);
+            trainRoute.push([744, 90, 1.57]);
+            trainRoute.push([746, 90, 1.57]);
+            trainRoute.push([748, 90, 1.57]);
+            trainRoute.push([750, 90, 1.57]);
+            trainRoute.push([752, 90, 1.57]);
+            trainRoute.push([754, 90, 1.57]);
+            trainRoute.push([756, 90, 1.57]);
+            trainRoute.push([758, 90, 1.57]);
+            trainRoute.push([760, 90, 1.57]);
+            trainRoute.push([762, 90, 1.57]);
+            trainRoute.push([764, 90, 1.57]);
+            trainRoute.push([766, 90, 1.57]);
+            trainRoute.push([768, 90, 1.57]);
+            trainRoute.push([770, 90, 1.57]);
+            trainRoute.push([772, 90, 1.57]);
+            trainRoute.push([774, 90, 1.57]);
+            trainRoute.push([776, 90, 1.57]);
+            trainRoute.push([778, 90, 1.57]);
+            trainRoute.push([780, 90, 1.57]);
+            trainRoute.push([782, 90, 1.57]);
+            trainRoute.push([784, 90, 1.57]);
+            trainRoute.push([786, 90, 1.57]);
+            trainRoute.push([788, 90, 1.57]);
+            trainRoute.push([790, 90, 1.57]);
+            trainRoute.push([792, 90, 1.57]);
+            trainRoute.push([794, 90, 1.57]);
+            trainRoute.push([796, 90, 1.57]);
+            trainRoute.push([798, 90, 1.57]);
             trainRoute.push([0, 0, 3.14]);
             trainRoute.push([0, 0, 3.14]);
             trainRoute.push([0, 0, 3.14]);
@@ -1694,6 +1740,7 @@ function drawImageRotated(image, x, y, scale, rotation) {
 }
 function drawTrain() {
     return __awaiter(this, void 0, void 0, function () {
+        var cart, cartPosition, index;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -1701,13 +1748,24 @@ function drawTrain() {
                         trainCurrPos = 0;
                         trainTimer = 0;
                     }
-                    console.log("TCP" + trainCurrPos);
                     if (trainTimer % trainSpeed == 0) {
                         trainCurrPos += 1;
                     }
                     return [4 /*yield*/, drawImageRotated(trainHead, trainRoute[trainCurrPos][0], trainRoute[trainCurrPos][1], trainScale, trainRoute[trainCurrPos][2])];
                 case 1:
                     _a.sent();
+                    for (index = 0; index < cartsBought.length; index++) {
+                        cart = cartsBought[index];
+                        if (index == 0) {
+                            cartPosition = trainCurrPos - ((index + 1) * cartFollowingDistance);
+                        }
+                        else {
+                            cartPosition = trainCurrPos - ((index + 1) * distanceBetweenCarts);
+                        }
+                        if (cartPosition > 0) {
+                            drawImageRotated(cart, trainRoute[cartPosition][0], trainRoute[cartPosition][1], cartScale, trainRoute[cartPosition][2]);
+                        }
+                    }
                     trainTimer += 1;
                     return [2 /*return*/];
             }
