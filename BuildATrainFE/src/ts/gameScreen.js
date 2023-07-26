@@ -56,6 +56,7 @@ var blTurn;
 var trTurn;
 var brTurn;
 var trainHead;
+var smoke;
 var fuelCart;
 var cargoCart;
 var passangerCart;
@@ -69,6 +70,7 @@ var cartFollowingDistance;
 var distanceBetweenCarts;
 var locomotiveChoice = "medium";
 var cartsBought = []; //Everytime a user buys a cart it must be added to this array
+//TODO: smoke and some decorations
 //TODO: see how I autoresized canvas from prev project
 function loadImage(url) {
     return new Promise(function (resolve, reject) {
@@ -161,12 +163,9 @@ function loadAllImages() {
                     return [4 /*yield*/, loadImage('./images/trainParts/passangerCart.png')];
                 case 23:
                     passangerCart = _b.sent();
-                    cartsBought.push(fuelCart);
-                    cartsBought.push(passangerCart);
-                    cartsBought.push(cargoCart);
-                    cartsBought.push(fuelCart);
-                    cartsBought.push(passangerCart);
-                    cartsBought.push(cargoCart);
+                    return [4 /*yield*/, loadImage('./images/trainParts/smoke.png')];
+                case 24:
+                    smoke = _b.sent();
                     return [2 /*return*/];
             }
         });
@@ -1753,6 +1752,9 @@ function drawTrain() {
                     }
                     return [4 /*yield*/, drawImageRotated(trainHead, trainRoute[trainCurrPos][0], trainRoute[trainCurrPos][1], trainScale, trainRoute[trainCurrPos][2])];
                 case 1:
+                    _a.sent();
+                    return [4 /*yield*/, drawImageRotated(smoke, trainRoute[trainCurrPos][0], trainRoute[trainCurrPos][1], 0.2, trainRoute[trainCurrPos][2])];
+                case 2:
                     _a.sent();
                     for (index = 0; index < cartsBought.length; index++) {
                         cart = cartsBought[index];

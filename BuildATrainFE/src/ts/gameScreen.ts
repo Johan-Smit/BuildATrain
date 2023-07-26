@@ -23,6 +23,8 @@ let trTurn:CanvasImageSource;
 let brTurn:CanvasImageSource;
 
 let trainHead:CanvasImageSource;
+let smoke:CanvasImageSource;
+
 let fuelCart:CanvasImageSource;
 let cargoCart:CanvasImageSource;
 let passangerCart:CanvasImageSource;
@@ -38,6 +40,8 @@ let cartFollowingDistance:number;
 let distanceBetweenCarts:number;
 let locomotiveChoice: string = "medium";
 let cartsBought: CanvasImageSource[] = [];//Everytime a user buys a cart it must be added to this array
+
+//TODO: smoke and some decorations
 
 
 //TODO: see how I autoresized canvas from prev project
@@ -100,13 +104,15 @@ async function loadAllImages()
     cargoCart = await loadImage('./images/trainParts/cargoCart.png');
     passangerCart = await loadImage('./images/trainParts/passangerCart.png');
 
-    cartsBought.push(fuelCart);
-    cartsBought.push(passangerCart);
-    cartsBought.push(cargoCart);
+    smoke = await loadImage('./images/trainParts/smoke.png');
 
-    cartsBought.push(fuelCart);
-    cartsBought.push(passangerCart);
-    cartsBought.push(cargoCart);
+    // cartsBought.push(fuelCart);
+    // cartsBought.push(passangerCart);
+    // cartsBought.push(cargoCart);
+
+    // cartsBought.push(fuelCart);
+    // cartsBought.push(passangerCart);
+    // cartsBought.push(cargoCart);
 
 }
 
@@ -1711,6 +1717,7 @@ async function drawTrain() {
     }
 
     await drawImageRotated(trainHead,trainRoute[trainCurrPos][0],trainRoute[trainCurrPos][1],trainScale,trainRoute[trainCurrPos][2]);
+    await drawImageRotated(smoke,trainRoute[trainCurrPos][0],trainRoute[trainCurrPos][1],0.2,trainRoute[trainCurrPos][2]);
 
     let cart:CanvasImageSource;
     let cartPosition:number;
