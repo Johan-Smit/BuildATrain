@@ -60,6 +60,9 @@ var trTurn;
 var brTurn;
 var trainHead;
 var smoke;
+var smallTrain;
+var medTrain;
+var largeTrain;
 var fuelCart;
 var cargoCart;
 var passangerCart;
@@ -72,10 +75,8 @@ var gridSize = 15;
 var trackSize = 10;
 var cartScale = 0.20;
 var cartFollowingDistance;
-var locomotiveChoice = "small";
+var locomotiveChoice;
 var cartsBought = []; //Everytime a user buys a cart it must be added to this array
-//TODO: smoke and some decorations
-//TODO: see how I autoresized canvas from prev project
 function loadImage(url) {
     return new Promise(function (resolve, reject) {
         var image = new Image();
@@ -88,88 +89,68 @@ function loadImage(url) {
 }
 function loadAllImages() {
     return __awaiter(this, void 0, void 0, function () {
-        var _a;
-        return __generator(this, function (_b) {
-            switch (_b.label) {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
                 case 0: return [4 /*yield*/, loadImage('./images/gameGrid/tileGrass1.png')];
                 case 1:
-                    grass = _b.sent();
+                    grass = _a.sent();
                     return [4 /*yield*/, loadImage('./images/gameGrid/tileGrass_transitionE.png')];
                 case 2:
-                    vertTrans = _b.sent();
+                    vertTrans = _a.sent();
                     return [4 /*yield*/, loadImage('./images/gameGrid/tileGrass_transitionW.png')];
                 case 3:
-                    vertTrans2 = _b.sent();
+                    vertTrans2 = _a.sent();
                     return [4 /*yield*/, loadImage('./images/gameGrid/tileSand1.png')];
                 case 4:
-                    sand = _b.sent();
+                    sand = _a.sent();
                     return [4 /*yield*/, loadImage('./images/gameGrid/tileGrass_transitionS.png')];
                 case 5:
-                    horzTrans = _b.sent();
+                    horzTrans = _a.sent();
                     return [4 /*yield*/, loadImage('./images/gameGrid/tileGrass_transitionN.png')];
                 case 6:
-                    horzTrans2 = _b.sent();
+                    horzTrans2 = _a.sent();
                     return [4 /*yield*/, loadImage('./images/gameGrid/treeBrown_large.png')];
                 case 7:
-                    treesB = _b.sent();
+                    treesB = _a.sent();
                     return [4 /*yield*/, loadImage('./images/trainTracks/horzTrack.png')];
                 case 8:
-                    horzTrack = _b.sent();
+                    horzTrack = _a.sent();
                     return [4 /*yield*/, loadImage('./images/trainTracks/vertTrack2.png')];
                 case 9:
-                    vertTrack = _b.sent();
+                    vertTrack = _a.sent();
                     return [4 /*yield*/, loadImage('./images/trainTracks/topLeftTurn.png')];
                 case 10:
-                    tlTurn = _b.sent();
+                    tlTurn = _a.sent();
                     return [4 /*yield*/, loadImage('./images/trainTracks/bottomLeftTurn.png')];
                 case 11:
-                    blTurn = _b.sent();
+                    blTurn = _a.sent();
                     return [4 /*yield*/, loadImage('./images/trainTracks/topRightTurn.png')];
                 case 12:
-                    trTurn = _b.sent();
+                    trTurn = _a.sent();
                     return [4 /*yield*/, loadImage('./images/trainTracks/bottomRightTurn.png')];
                 case 13:
-                    brTurn = _b.sent();
-                    _a = locomotiveChoice;
-                    switch (_a) {
-                        case "small": return [3 /*break*/, 14];
-                        case "medium": return [3 /*break*/, 16];
-                        case "large": return [3 /*break*/, 18];
-                    }
-                    return [3 /*break*/, 20];
-                case 14: return [4 /*yield*/, loadImage('./images/trainParts/locomotiveSmall.png')];
+                    brTurn = _a.sent();
+                    return [4 /*yield*/, loadImage('./images/trainParts/locomotiveSmall.png')];
+                case 14:
+                    smallTrain = _a.sent();
+                    return [4 /*yield*/, loadImage('./images/trainParts/locomotiveMedium.png')];
                 case 15:
-                    trainHead = _b.sent();
-                    trainScale = 0.18;
-                    cartFollowingDistance = 25;
-                    return [3 /*break*/, 20];
-                case 16: return [4 /*yield*/, loadImage('./images/trainParts/locomotiveMedium.png')];
+                    medTrain = _a.sent();
+                    return [4 /*yield*/, loadImage('./images/trainParts/locomotiveLarge.png')];
+                case 16:
+                    largeTrain = _a.sent();
+                    return [4 /*yield*/, loadImage('./images/trainParts/fuelCart.png')];
                 case 17:
-                    trainHead = _b.sent();
-                    trainScale = 0.2;
-                    cartFollowingDistance = 30;
-                    return [3 /*break*/, 20];
-                case 18: return [4 /*yield*/, loadImage('./images/trainParts/locomotiveLarge.png')];
-                case 19:
-                    trainHead = _b.sent();
-                    trainScale = 0.22;
-                    cartFollowingDistance = 43;
-                    return [3 /*break*/, 20];
-                case 20: return [4 /*yield*/, loadImage('./images/trainParts/fuelCart.png')];
-                case 21:
-                    fuelCart = _b.sent();
+                    fuelCart = _a.sent();
                     return [4 /*yield*/, loadImage('./images/trainParts/cargoCart.png')];
-                case 22:
-                    cargoCart = _b.sent();
+                case 18:
+                    cargoCart = _a.sent();
                     return [4 /*yield*/, loadImage('./images/trainParts/passangerCart.png')];
-                case 23:
-                    passangerCart = _b.sent();
+                case 19:
+                    passangerCart = _a.sent();
                     return [4 /*yield*/, loadImage('./images/trainParts/smoke.png')];
-                case 24:
-                    smoke = _b.sent();
-                    cartsBought.push(fuelCart);
-                    cartsBought.push(passangerCart);
-                    cartsBought.push(cargoCart);
+                case 20:
+                    smoke = _a.sent();
                     return [2 /*return*/];
             }
         });
@@ -394,6 +375,9 @@ function drawTrain() {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
+                    if (trainHead == undefined) {
+                        return [2 /*return*/];
+                    }
                     if (trainCurrPos >= trainRouteSize - 1) {
                         trainCurrPos = 0;
                         trainTimer = 0;
@@ -410,6 +394,7 @@ function drawTrain() {
                     return [4 /*yield*/, drawImageRotated(smoke, trainRoute[trainCurrPos][0], trainRoute[trainCurrPos][1], 0.1, trainRoute[trainCurrPos][2])];
                 case 2:
                     _a.sent();
+                    firstCartPos = 0;
                     for (index = 0; index < cartsBought.length; index++) {
                         cart = cartsBought[index];
                         if (index == 0) {
@@ -452,6 +437,9 @@ function drawGame() {
             }
         });
     });
+}
+function updateTrain(trainsInfo) {
+    console.log(trainsInfo);
 }
 document.addEventListener("DOMContentLoaded", function () { return __awaiter(_this, void 0, void 0, function () {
     return __generator(this, function (_a) {
