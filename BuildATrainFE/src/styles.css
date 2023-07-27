@@ -138,10 +138,6 @@ body,html {
   grid-template-columns: 1fr 1fr;
   width: 90%;
   justify-self: center;
-
-  @media screen and (min-width: 780px) {
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-  }
 }
 
 .game-stats figure {

@@ -25,7 +25,7 @@ function sseUpdate(event) {
   const [ money, income ] = event.data.split('\n');
   console.log(money,income);
   document.getElementById('money-total').textContent = money ? money : 0;
-  document.getElementById('income').textContent = income ? income : 0;
+  document.getElementById('income').textContent = income ? `${income} / 10s` : `0 / 10s`;
 }
 
 function subscribeToSSE() {
