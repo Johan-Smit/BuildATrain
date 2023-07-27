@@ -20,6 +20,22 @@ let token;
 
 let email;
 
+function sseUpdate(event) {
+  console.log(event);
+  const [ money, income ] = event.data.split('\n');
+  console.log(money,income);
+  document.getElementById('money-total').textContent = money ? money : 0;
+  document.getElementById('income').textContent = income ? income : 0;
+}
+
+function subscribeToSSE() {
+  const source = new EventSource(`${apiHost}/sse-events?email=${email}`);
+  source.onopen = () => console.log('---Connection Established---');
+  source.onerror = () => console.log('---Connection Failed---');
+
+  source.onmessage = (event) => { sseUpdate(event) }; //Function for SSE updates here
+}
+
 function changeSelected(newTrainName) {
   const trainList = document.getElementById('train-select');
   const options = Array.from(trainList.options);
@@ -29,41 +45,40 @@ function changeSelected(newTrainName) {
 
 function selectTrain(){
   trainName = document.getElementById('train-select').selectedOptions[0].innerText;
-  updateTrain(game.gameModel.trains.find((train) => { train.locomotiveName === trainName}));
+  updateTrain(game.trains.find((train) => { train.locomotiveName === trainName}));
 }
 
 async function loadGame(){
   token = getCookie('oauth_token');
   email = getCookie('email');
   try {
-    const response = await fetch(`${apiHost}/game/load`, {
+    const response = await fetch(`${apiHost}/game/load?Email=${email}`, {
       method: 'GET',
       mode: 'cors',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
-      },
-      queryParams: {
-        'email': email
       }
     });
 
     if (response?.ok) {
 
+      subscribeToSSE();
+
       game = await response.json();
 
       const trainList = document.getElementById('train-select');
 
-      if (game.gameModel.trains) {
+      if (game.trains.length > 0) {
 
-        game.gameModel.trains.map((train) => {
+        game.trains.map((train) => {
           const option = document.createElement('option');
           option.textContent = train.locomotiveName;
           trainList.appendChild(option);
         });
 
       
-        updateTrain(game.gameModel.trains[0]);
+        updateTrain(game.trains[0]);
       }
 
     }
@@ -84,19 +99,19 @@ async function purchasePassenger(){
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
-      body: {
+      body: JSON.stringify({
         'email': email,
         'locomotiveName': trainName,
         'carType': carTypes.Passenger
-      }
+      })
     });
 
     if (response?.ok){
       const myJSON = await response.json();
-      const index = game.gameModel.trains.findIndex((train) => {train.locomotiveName === myJSON.newTrainModel.locomotiveName});
+      const index = game.trains.findIndex((train) => {train.locomotiveName === myJSON.locomotiveName});
       if (index !== -1) {
-        game.gameModel.trains[index] = myJSON.newTrainModel;
-        updateTrain(game.gameModel.trains[index]);
+        game.trains[index] = myJSON;
+        updateTrain(game.trains[index]);
       }
     }
 
@@ -116,19 +131,19 @@ async function purchaseCargo(){
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
-      body: {
+      body: JSON.stringify({
         'email': email,
         'locomotiveName': trainName,
         'carType': carTypes.Cargo
-      }
+      })
     });
 
     if (response?.ok){
       const myJSON = await response.json();
-      const index = game.gameModel.trains.findIndex((train) => {train.locomotiveName === myJSON.newTrainModel.locomotiveName});
+      const index = game.trains.findIndex((train) => {train.locomotiveName === myJSON.locomotiveName});
       if (index !== -1) {
-        game.gameModel.trains[index] = myJSON.newTrainModel;
-        updateTrain(game.gameModel.trains[index]);
+        game.trains[index] = myJSON;
+        updateTrain(game.trains[index]);
       }
     }
 
@@ -147,19 +162,19 @@ async function purchaseFuel(){
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
-      body: {
+      body: JSON.stringify({
         'email': email,
         'locomotiveName': trainName,
         'carType': carTypes.Fuel
-      }
+      })
     });
 
     if (response?.ok){
       const myJSON = await response.json();
-      const index = game.gameModel.trains.findIndex((train) => {train.locomotiveName === myJSON.newTrainModel.locomotiveName});
+      const index = game.trains.findIndex((train) => {train.locomotiveName === myJSON.locomotiveName});
       if (index !== -1) {
-        game.gameModel.trains[index] = myJSON.newTrainModel;
-        updateTrain(game.gameModel.trains[index]);
+        game.trains[index] = myJSON;
+        updateTrain(game.trains[index]);
       }
     }
 
@@ -171,7 +186,7 @@ async function purchaseFuel(){
 
 async function purchaseTrain(){
   trainType = document.getElementById('train-type-select').selectedOptions[0].innerText;
-  const locomotiveName = document.getElementById('locomotiveName').innerText;
+  const locomotiveName = document.getElementById('locomotiveName').value;
   let locomotiveType;
   switch (trainType) {
     case 'Small':
@@ -189,6 +204,7 @@ async function purchaseTrain(){
 
   try{
 
+    console.log(email, locomotiveName, locomotiveType);
     const response = await fetch(`${apiHost}/game/add/train`, {
       method: 'POST',
       mode: 'cors',
@@ -196,26 +212,26 @@ async function purchaseTrain(){
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
-      body: {
+      body: JSON.stringify({
         'email': email,
         'locomotiveName': locomotiveName, 
         'locomotiveType': locomotiveType
-      }
+      })
     });
 
     if (response?.ok) {
       const myJSON = await response.json();
-      if (myJSON.newGameModel) {
-        game.gameModel = myJSON.newGameModel;
+      if (myJSON.trains) {
+        game.trains = myJSON.trains;
       }
     }
 
-    updateTrain(game.gameModel.trains.find((train) => train.locomotiveName === locomotiveName));
+    updateTrain(game.trains.find((train) => train.locomotiveName === locomotiveName));
 
     const trainList = document.getElementById('train-select');
     trainList.options.length = 0;
 
-    game.gameModel.trains.map((train) => {
+    game.trains.map((train) => {
       const option = document.createElement('option');
       option.textContent = train.locomotiveName;
       trainList.appendChild(option);
@@ -239,31 +255,29 @@ async function deleteTrain(){
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
-      body: {
+      body: JSON.stringify({
         'email': email,
         'locomotiveName': trainName
-      }
+      })
     });
 
     if (response?.ok) {
       const myJSON = await response.json();
-      if (myJSON.newGameModel) {
-        game.gameModel = myJSON.newGameModel;
-      }
+      game.trains = myJSON.trains;
     }
 
     const trainList = document.getElementById('train-select');
     trainList.options.length = 0;
 
-    game.gameModel.trains.map((train) => {
+    game.trains.map((train) => {
       const option = document.createElement('option');
       option.textContent = train.locomotiveName;
       trainList.appendChild(option);
     });
 
-    if (game.gameModel.trains) {
-      updateTrain(game.gameModel.trains[0]);
-      changeSelected(game.gameMode.trains[0].locomotiveName);
+    if (game.trains.length > 0) {
+      updateTrain(game.trains[0]);
+      changeSelected(game.trains[0].locomotiveName);
     }
 
   }
@@ -282,19 +296,19 @@ async function deletePassenger(){
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
-      body: {
+      body: JSON.stringify({
         'email': email,
         'locomotiveName': trainName,
         'carType': carTypes.Passenger
-      }
+      })
     });
 
     if (response?.ok){
       const myJSON = await response.json();
-      const index = game.gameModel.trains.findIndex((train) => {train.locomotiveName === myJSON.newTrainModel.locomotiveName});
+      const index = game.trains.findIndex((train) => {train.locomotiveName === myJSON.locomotiveName});
       if (index !== -1) {
-        game.gameModel.trains[index] = myJSON.newTrainModel;
-        updateTrain(game.gameModel.trains[index]);
+        game.trains[index] = myJSON;
+        updateTrain(game.trains[index]);
       }
     }
 
@@ -314,19 +328,19 @@ async function deleteCargo(){
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
-      body: {
+      body: JSON.stringify({
         'email': email,
         'locomotiveName': trainName,
         'carType': carTypes.Cargo
-      }
+      })
     });
 
     if (response?.ok){
       const myJSON = await response.json();
-      const index = game.gameModel.trains.findIndex((train) => {train.locomotiveName === myJSON.newTrainModel.locomotiveName});
+      const index = game.trains.findIndex((train) => {train.locomotiveName === myJSON.locomotiveName});
       if (index !== -1) {
-        game.gameModel.trains[index] = myJSON.newTrainModel;
-        updateTrain(game.gameModel.trains[index]);
+        game.trains[index] = myJSON;
+        updateTrain(game.trains[index]);
       }
     }
 
@@ -346,19 +360,19 @@ async function deleteFuel(){
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
-      body: {
+      body: JSON.stringify({
         'email': email,
         'locomotiveName': trainName,
         'carType': carTypes.Fuel
-      }
+      })
     });
 
     if (response?.ok){
       const myJSON = await response.json();
-      const index = game.gameModel.trains.findIndex((train) => {train.locomotiveName === myJSON.newTrainModel.locomotiveName});
+      const index = game.trains.findIndex((train) => {train.locomotiveName === myJSON.locomotiveName});
       if (index !== -1) {
-        game.gameModel.trains[index] = myJSON.newTrainModel;
-        updateTrain(game.gameModel.trains[index]);
+        game.trains[index] = myJSON;
+        updateTrain(game.trains[index]);
       }
     }
 
