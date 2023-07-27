@@ -91,6 +91,10 @@ app.get('/login', (req, res) => {
   res.sendFile(__dirname + '/src/login.html');
 });
 
+app.get('/', (req, res) => {
+  res.redirect('/login');
+});
+
 app.get('/some-route', ensureAuthenticated, (req: express.Request, res: express.Response) => {
   // This code will only be executed if the user is authenticated.
   // Here we are asserting that req.user will exist
@@ -103,8 +107,6 @@ app.get('/game', ensureAuthenticated, (req: express.Request, res: express.Respon
   res.sendFile(__dirname + '/src/game.html');
 });
 
-
-
-app.listen(4000, () => {
+app.listen(port, () => {
   console.log('Server is running on port 4000');
 });
