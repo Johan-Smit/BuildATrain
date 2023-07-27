@@ -5,14 +5,6 @@ import GoogleStrategy from 'passport-google-oauth20';
 import { Profile } from 'passport-google-oauth20';
 import dotenv from 'dotenv';
 
-declare module 'express-session' {
-  export interface SessionData {
-    token: string;
-    refresh: any;
-    profile: Profile;
-  }
-}
-
 dotenv.config();
 
 const app = express();
