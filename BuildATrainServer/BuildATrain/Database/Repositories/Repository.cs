@@ -156,6 +156,18 @@ namespace BuildATrain.Database.Repositories
                     .FromSqlRaw("EXEC GetCurrentWalletByEmail @Email", emailParam)
                     .ToListAsync();
 
+                if (result.Count == 0)
+                {
+
+                    var emailParamNew = new SqlParameter("@email", SqlDbType.NChar) { Value = email };
+
+                    await _context.Database.ExecuteSqlRawAsync("INSERT INTO Players (Username, Email) VALUES ('', @email)", emailParamNew);
+                }
+
+                result = await _context.Set<WalletModel>()
+                    .FromSqlRaw("EXEC GetCurrentWalletByEmail @Email", emailParam)
+                    .ToListAsync();
+
                 return result.FirstOrDefault();
             }
             catch(Exception ex)
