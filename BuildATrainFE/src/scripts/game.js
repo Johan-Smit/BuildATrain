@@ -79,7 +79,7 @@ async function purchasePassenger(){
     locomotiveTypeId: locomotiveTypes.Large,
     locomotiveName: "Thomas",
     numPassengerCars: 5,
-    numCargoCars: 5,
+    numCargoCars: 0,
     numFuelCars: 5
   });
 };
@@ -103,6 +103,15 @@ async function purchaseCargo(){
   catch(error) {
     console.error(error);
   }
+
+  updateTrain({
+    trainId: 0,
+    locomotiveTypeId: locomotiveTypes.Medium,
+    locomotiveName: "Thomas",
+    numPassengerCars: 0,
+    numCargoCars: 1,
+    numFuelCars: 0
+  });
 };
 
 async function purchaseFuel(){
