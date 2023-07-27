@@ -188,6 +188,8 @@ namespace BuildATrain.Database.Repositories
             {
 
             }
+
+            return false;
         }
     }
 }
