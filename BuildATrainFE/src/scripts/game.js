@@ -20,8 +20,9 @@ let token;
 
 let email;
 
-function updateTrainName(){
+function selectTrain(){
   trainName = document.getElementById('train-select').selectedOptions[0].innerText;
+  updateTrain(game.gameModel.trains.find((train) => { train.locomotiveName === trainName}));
 }
 
 async function loadGame(){
@@ -39,15 +40,27 @@ async function loadGame(){
         'email': email
       }
     });
+
     if (response?.ok) {
+
       game = await response.json();
+
       const trainList = document.getElementById('train-select');
-      game.trains.map((train) => {
-        const option = document.createElement('option');
-        option.textContent = train.locomotiveName;
-        trainList.appendChild(option);
-      });
+
+      if (game.gameModel.trains) {
+
+        game.gameModel.trains.map((train) => {
+          const option = document.createElement('option');
+          option.textContent = train.locomotiveName;
+          trainList.appendChild(option);
+        });
+
+      
+        updateTrain(game.gameModel.trains[0]);
+      }
+
     }
+
   }
   catch(error) {
     console.error(error);
@@ -56,6 +69,7 @@ async function loadGame(){
 
 async function purchasePassenger(){
   try{
+
     const response = await fetch(`${apiHost}/game/add/car`, {
       method: 'POST',
       mode: 'cors',
@@ -69,23 +83,25 @@ async function purchasePassenger(){
         'carType': carTypes.Passenger
       }
     });
+
+    if (response?.ok){
+      const myJSON = await response.json();
+      const index = game.gameModel.trains.findIndex((train) => {train.locomotiveName === myJSON.newTrainModel.locomotiveName});
+      if (index !== -1) {
+        game.gameModel.trains[index] = myJSON.newTrainModel;
+        updateTrain(game.gameModel.trains[index]);
+      }
+    }
+
   }
   catch(error) {
     console.error(error);
   }
-
-  updateTrain({
-    trainId: 0,
-    locomotiveTypeId: locomotiveTypes.Large,
-    locomotiveName: "Thomas",
-    numPassengerCars: 5,
-    numCargoCars: 0,
-    numFuelCars: 5
-  });
 };
 
 async function purchaseCargo(){
   try{
+
     const response = await fetch(`${apiHost}/game/add/car`, {
       method: 'POST',
       mode: 'cors',
@@ -99,19 +115,20 @@ async function purchaseCargo(){
         'carType': carTypes.Cargo
       }
     });
+
+    if (response?.ok){
+      const myJSON = await response.json();
+      const index = game.gameModel.trains.findIndex((train) => {train.locomotiveName === myJSON.newTrainModel.locomotiveName});
+      if (index !== -1) {
+        game.gameModel.trains[index] = myJSON.newTrainModel;
+        updateTrain(game.gameModel.trains[index]);
+      }
+    }
+
   }
   catch(error) {
     console.error(error);
   }
-
-  updateTrain({
-    trainId: 0,
-    locomotiveTypeId: locomotiveTypes.Medium,
-    locomotiveName: "Thomas",
-    numPassengerCars: 0,
-    numCargoCars: 1,
-    numFuelCars: 0
-  });
 };
 
 async function purchaseFuel(){
@@ -129,6 +146,16 @@ async function purchaseFuel(){
         'carType': carTypes.Fuel
       }
     });
+
+    if (response?.ok){
+      const myJSON = await response.json();
+      const index = game.gameModel.trains.findIndex((train) => {train.locomotiveName === myJSON.newTrainModel.locomotiveName});
+      if (index !== -1) {
+        game.gameModel.trains[index] = myJSON.newTrainModel;
+        updateTrain(game.gameModel.trains[index]);
+      }
+    }
+
   }
   catch(error) {
     console.error(error);
@@ -137,6 +164,7 @@ async function purchaseFuel(){
 
 async function purchaseTrain(){
   trainType = document.getElementById('train-type-select').selectedOptions[0].innerText;
+  const locomotiveName = document.getElementById('locomotiveName').innerText;
   let locomotiveType;
   switch (trainType) {
     case 'Small':
@@ -153,6 +181,7 @@ async function purchaseTrain(){
   }
 
   try{
+
     const response = await fetch(`${apiHost}/game/add/car`, {
       method: 'POST',
       mode: 'cors',
@@ -162,10 +191,22 @@ async function purchaseTrain(){
       },
       body: {
         'email': email,
-        'locomotiveName': trainName,
+        'locomotiveName': locomotiveName, 
         'locomotiveType': locomotiveType
       }
     });
+
+    if (response?.ok) {
+      const myJSON = await response.json();
+      if (myJSON.newGameModel) {
+        game.gameModel = myJSON.newGameModel;
+      }
+    }
+
+    updateTrain(game.gameModel.trains.find((train) => train.locomotiveName === locomotiveName));
+    
+    //TODO update train-select options
+
   }
   catch(error) {
     console.error(error);
@@ -174,6 +215,7 @@ async function purchaseTrain(){
 
 async function deleteTrain(){
   try{
+
     const response = await fetch(`${apiHost}/remove/train`, {
       method: 'DELETE',
       mode: 'cors',
@@ -186,6 +228,19 @@ async function deleteTrain(){
         'locomotiveName': trainName
       }
     });
+
+    if (response?.ok) {
+      const myJSON = await response.json();
+      if (myJSON.newGameModel) {
+        game.gameModel = myJSON.newGameModel;
+      }
+    }
+
+    if (game.gameModel.trains) {
+      updateTrain(game.gameModel.trains[0]);
+    }
+
+    //TODO Update train-select options
   }
   catch(error) {
     console.error(error);
@@ -194,6 +249,7 @@ async function deleteTrain(){
 
 async function deletePassenger(){
   try{
+
     const response = await fetch(`${apiHost}/remove/car`, {
       method: 'DELETE',
       mode: 'cors',
@@ -207,6 +263,16 @@ async function deletePassenger(){
         'carType': carTypes.Passenger
       }
     });
+
+    if (response?.ok){
+      const myJSON = await response.json();
+      const index = game.gameModel.trains.findIndex((train) => {train.locomotiveName === myJSON.newTrainModel.locomotiveName});
+      if (index !== -1) {
+        game.gameModel.trains[index] = myJSON.newTrainModel;
+        updateTrain(game.gameModel.trains[index]);
+      }
+    }
+
   }
   catch(error) {
     console.error(error);
@@ -215,6 +281,7 @@ async function deletePassenger(){
 
 async function deleteCargo(){
   try{
+
     const response = await fetch(`${apiHost}/remove/car`, {
       method: 'DELETE',
       mode: 'cors',
@@ -228,6 +295,16 @@ async function deleteCargo(){
         'carType': carTypes.Cargo
       }
     });
+
+    if (response?.ok){
+      const myJSON = await response.json();
+      const index = game.gameModel.trains.findIndex((train) => {train.locomotiveName === myJSON.newTrainModel.locomotiveName});
+      if (index !== -1) {
+        game.gameModel.trains[index] = myJSON.newTrainModel;
+        updateTrain(game.gameModel.trains[index]);
+      }
+    }
+
   }
   catch(error) {
     console.error(error);
@@ -236,6 +313,7 @@ async function deleteCargo(){
 
 async function deleteFuel(){
   try{
+
     const response = await fetch(`${apiHost}/remove/car`, {
       method: 'DELETE',
       mode: 'cors',
@@ -249,9 +327,16 @@ async function deleteFuel(){
         'carType': carTypes.Fuel
       }
     });
-    if (response.ok){
+
+    if (response?.ok){
       const myJSON = await response.json();
+      const index = game.gameModel.trains.findIndex((train) => {train.locomotiveName === myJSON.newTrainModel.locomotiveName});
+      if (index !== -1) {
+        game.gameModel.trains[index] = myJSON.newTrainModel;
+        updateTrain(game.gameModel.trains[index]);
+      }
     }
+
   }
   catch(error) {
     console.error(error);
