@@ -64,7 +64,7 @@ body, html {
 
 .game-grid {
   width: 100%;
-  min-height: 300px;
+  min-height: 60vh;
 }
 
 .game-controls {
@@ -86,23 +86,26 @@ body, html {
 }
 
 .info-graphic img {
-  width: 100px;
-  height: 100px;
+  width: 50px;
+  height: 50px;
 }
 
 .info-graphic figcaption{
   text-align: center;
 }
 
-.game-stats {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+.panel {
   background: rgba(66, 133, 244, 1);
   color: #fff;
   padding: 5px;
   text-decoration: none;
   border-radius: 5px; 
   border: 2px solid black;
+}
+
+.game-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
 
   @media screen and (min-width: 780px) {
     grid-template-columns: 1fr 1fr 1fr 1fr;
@@ -128,4 +131,25 @@ body, html {
   display: flex;
   justify-content: center;
   width: 100%;
+}
+
+.car-controls {
+  display: flex;
+  flex-direction: column;
+  row-gap: 5px;
+}
+
+.purchase {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  row-gap: 5px;
+}
+
+.purchase label {
+  text-align: center;
+  align-self: center;
+}
+
+.wide-button {
+  grid-column: span 2;
 }

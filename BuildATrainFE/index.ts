@@ -69,10 +69,19 @@ app.get('/login', (req, res) => {
 });
 
 // Game route
-app.get('/game', (req, res ) => {
+app.get('/game', (req, res) => {
   res.sendFile(__dirname + '/src/game.html');
 });
 
+// Train route
+app.get('/train', (req, res) => {
+  res.sendFile(__dirname + '/src/train.html');
+});
+
+// Train form endpoint
+app.post('/train', (req, res) => {
+  req.query;
+});
 
 app.listen(4000, () => {
   console.log('Server is running on port 4000');

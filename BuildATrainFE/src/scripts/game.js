@@ -1,8 +1,28 @@
-const apiHost = 'http://localhost:5023'
+const apiHost = 'http://localhost:5023';
+
+const locomotiveTypes = {
+  Small: 0,
+  Medium: 1,
+  Large: 2
+}
+
+const carTypes = {
+  Passenger: 0,
+  Cargo: 1, 
+  Fuel: 2
+}
+
+let game;
+
+let trainName;
+
+function updateTrainName(){
+  trainName = document.getElementById('train-select').selectedOptions[0].innerText;
+}
 
 async function loadGame(){
   try {
-    const response = await fetch(`http://localhost:5023/game/load`, {
+    const response = await fetch(`${apiHost}/game/load`, {
       method: 'GET',
       mode: 'cors',
       headers: {
@@ -14,8 +34,7 @@ async function loadGame(){
       }
     });
     if (response?.ok) {
-      const game = await response.json();
-      sessionStorage.setItem('trains', game);
+      game = await response.json();
       const trainList = document.getElementById('train-select');
       game.trains.map((train) => {
         const option = document.createElement('option');
@@ -25,7 +44,7 @@ async function loadGame(){
     }
   }
   catch(error) {
-    console.error(error);
+    console.log(error);
   }
 };
 
@@ -40,8 +59,8 @@ async function purchasePassenger(){
       },
       body: {
         'username': '',
-        'locomotiveName': '',
-        'carType': 0
+        'locomotiveName': trainName,
+        'carType': carTypes.Passenger
       }
     });
   }
@@ -61,8 +80,8 @@ async function purchaseCargo(){
       },
       body: {
         'username': '',
-        'locomotiveName': '',
-        'carType': 1
+        'locomotiveName': trainName,
+        'carType': carTypes.Cargo
       }
     });
   }
@@ -82,8 +101,8 @@ async function purchaseFuel(){
       },
       body: {
         'username': '',
-        'locomotiveName': '',
-        'carType': 2,
+        'locomotiveName': trainName,
+        'carType': carTypes.Fuel
       }
     });
   }
@@ -103,8 +122,91 @@ async function purchaseTrain(){
       },
       body: {
         'username': '',
-        'locomotiveName': '',
-        'locomotiveType': 0,
+        'locomotiveName': trainName,
+        'locomotiveType': 0
+      }
+    });
+  }
+  catch(error) {
+    console.error(error);
+  }
+};
+
+async function deleteTrain(){
+  try{
+    const response = await fetch(`${apiHost}/remove/train`, {
+      method: 'DELETE',
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+      },
+      body: {
+        'username': '',
+        'locomotiveName': trainName
+      }
+    });
+  }
+  catch(error) {
+    console.error(error);
+  }
+};
+
+async function deletePassenger(){
+  try{
+    const response = await fetch(`${apiHost}/remove/car`, {
+      method: 'DELETE',
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+      },
+      body: {
+        'username': '',
+        'locomotiveName': trainName,
+        'carType': carTypes.Passenger
+      }
+    });
+  }
+  catch(error) {
+    console.error(error);
+  }
+};
+
+async function deleteCargo(){
+  try{
+    const response = await fetch(`${apiHost}/remove/car`, {
+      method: 'DELETE',
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+      },
+      body: {
+        'username': '',
+        'locomotiveName': trainName,
+        'carType': carTypes.Cargo
+      }
+    });
+  }
+  catch(error) {
+    console.error(error);
+  }
+};
+
+async function deleteFuel(){
+  try{
+    const response = await fetch(`${apiHost}/remove/car`, {
+      method: 'DELETE',
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+      },
+      body: {
+        'username': '',
+        'locomotiveName': trainName,
+        'carType': carTypes.Fuel
       }
     });
   }
