@@ -16,21 +16,27 @@ let game;
 
 let trainName;
 
+let token;
+
+let user;
+
 function updateTrainName(){
   trainName = document.getElementById('train-select').selectedOptions[0].innerText;
 }
 
 async function loadGame(){
+  token = getCookie('oauth_token');
+  user = getCookie('email');
   try {
     const response = await fetch(`${apiHost}/game/load`, {
       method: 'GET',
       mode: 'cors',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+        'Authorization': `Bearer ${token}`
       },
       queryParams: {
-        'username': ''
+        'username': user
       }
     });
     if (response?.ok) {
@@ -55,7 +61,7 @@ async function purchasePassenger(){
       mode: 'cors',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+        'Authorization': `Bearer ${token}`
       },
       body: {
         'username': '',

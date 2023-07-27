@@ -6,6 +6,7 @@
     <title>Build-A-Train!</title>
     <link rel="stylesheet" href="styles.css">
     <script src="scripts/game.js" async defer></script>
+    <script src="scripts/auth.js" async defer></script>
   </head>
   <body>
     <main class="game-page">
@@ -30,6 +31,7 @@
           <img src="images/fuel-car.svg" alt="Fuel cars">
           <figcaption id="fuel-cars">0</figcaption>
         </figure>
+        <label id="tokenMessage"></label>
       </section>
 
       <section class="game-grid"></section>
@@ -82,14 +84,14 @@
           <button type="button" class="btn-game" onclick="deleteTrain()">Delete Train</button>
         </article>
         <article class="purchase panel">
-          <label for="locomotiveType">Purchase a new Train:</label>
-          <select class="btn-game" name="locomotiveType" id="train-type-select">
+          <label>Purchase a new Train:</label>
+          <select class="btn-game" id="train-type-select">
             <option>Small</option>
             <option>Medium</option>
             <option>Large</option>
           </select>
-          <label for="locomotiveName">Train name:</label>
-          <input type="text" name="locomotiveName" id="locomotiveName">
+          <label>Train name:</label>
+          <input type="text" id="locomotiveName">
           <button type="button" class="btn-game wide-button" onclick="purchaseTrain()" disabled>Purchase</button>
         </article>
       </section>
