@@ -81,6 +81,7 @@ app.get(
   (req, res) => {
     // Successful authentication, redirect home.
     res.cookie('oauth_token', req.session.passport.user.accessToken, { httpOnly: true, secure: true, sameSite: 'strict' });
+    res.cookie('email', req.session.passport.user.email, { httpOnly: true, secure: true, sameSite: 'strict' });
     res.redirect('/game');
   }
 );
