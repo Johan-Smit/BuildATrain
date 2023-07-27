@@ -37,7 +37,7 @@ namespace BuildATrain.Controllers
 
         [HttpPost]
         [Route("add/train")]
-        public async Task<IActionResult> AddTrain(PostAddTrainRequest postAddTrainRequest)
+        public async Task<IActionResult> AddTrain([FromBody] PostAddTrainRequest postAddTrainRequest)
         {
             var locomotiveSize = postAddTrainRequest.LocomotiveType.ToString();
             var locomotiveType = (int)postAddTrainRequest.LocomotiveType;
@@ -65,7 +65,7 @@ namespace BuildATrain.Controllers
 
         [HttpPost]
         [Route("add/car")]
-        public async Task<IActionResult> AddCar(PostAddCarRequest postAddCarRequest)
+        public async Task<IActionResult> AddCar([FromBody] PostAddCarRequest postAddCarRequest)
         {
             var email = postAddCarRequest.Email;
             var locomotiveName = postAddCarRequest.LocomotiveName;
@@ -110,7 +110,7 @@ namespace BuildATrain.Controllers
 
         [HttpDelete]
         [Route("remove/train")]
-        public async Task<IActionResult> RemoveTrain(DeleteRemoveTrainRequest deleteRemoveTrainRequest)
+        public async Task<IActionResult> RemoveTrain([FromBody] DeleteRemoveTrainRequest deleteRemoveTrainRequest)
         {
             var email = deleteRemoveTrainRequest.Email;
             var locomotiveName = deleteRemoveTrainRequest.LocomotiveName;
