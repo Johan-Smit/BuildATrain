@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add-A-Train!</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="scripts/train.js" async defer></script>
+  </head>
+  <body>
+    <main>
+
+      <article class="game-stats">
+
+        <figure>
+          <img src="images/money.svg" alt="Money">
+          <figcaption id="money-total">0</figcaption>
+        </figure>
+
+      </article>
+
+      <section class="game-controls">
+
+        <button type="button" class="btn-game" onclick="goBack()">Back to game</button>
+        <form action="/train" method="POST">
+          <select class="btn-game" name="locomotiveType" id="train-select">
+            <option>Small</option>
+            <option>Medium</option>
+            <option>Large</option>
+          </select>
+          <label>Train name:</label>
+          <input type="text" name="locomotiveName">
+          <button type="submit" class="btn-game">Submit</button>
+        </form>
+
+      </section>
+    </main>
+  </body>
+</html>

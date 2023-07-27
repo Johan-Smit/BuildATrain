@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Build-A-Train!</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="scripts/game.js" async defer></script>
+    <script src="scripts/auth.js" async defer></script>
+    <script src="./ts/gameScreen.js"></script>
+  </head>
+  <body>
+    <main class="game-page">
+
+      <section class="info-bar">
+        <figure class="info-graphic">
+          <img src="images/locomotive.svg" alt="Locomotive">
+          <figcaption id="locomotive-size">Small</figcaption>
+        </figure>
+
+        <figure class="info-graphic">
+          <img src="images/passenger-car.svg" alt="Passenger cars">
+          <figcaption id="passenger-cars">0</figcaption>
+        </figure>
+
+        <figure class="info-graphic">
+          <img src="images/cargo-car.svg" alt="Cargo cars">
+          <figcaption id="cargo-cars">0</figcaption>
+        </figure>
+
+        <figure class="info-graphic">
+          <img src="images/fuel-car.svg" alt="Fuel cars">
+          <figcaption id="fuel-cars">0</figcaption>
+        </figure>
+      </section>
+
+      <section class="game-grid">
+        <canvas id="canvas"></canvas>
+
+      </section>
+
+      <article class="game-stats panel">
+
+        <figure>
+          <img src="images/money.svg" alt="Money">
+          <figcaption id="money-total">0</figcaption>
+        </figure>
+
+        <figure>
+          <img src="images/income.svg" alt="Income">
+          <figcaption id="income">0 / 10s</figcaption>
+        </figure>
+
+      </article>
+
+      <section class="game-controls">
+        <article class="car-controls panel">
+          <label>Passenger Car</label>
+          <button type="button" class="btn-game" onclick="purchasePassenger()">Purchase Passenger Car</button>
+          <button type="button" class="btn-game" onclick="deletePassenger()">Remove Passenger Car</button>
+        </article>
+        <article class="car-controls panel">
+          <label>Cargo Car</label>
+          <button type="button" class="btn-game" onclick="purchaseCargo()">Purchase Cargo Car</button>
+          <button type="button" class="btn-game" onclick="deleteCargo()">Remove Cargo Car</button>
+        </article>
+        <article class="car-controls panel">
+          <label>Fuel Car</label>
+          <button type="button" class="btn-game" onclick="purchaseFuel()">Purchase Fuel Car</button>
+          <button type="button" class="btn-game" onclick="deletePassenger()">Remove Fuel Car</button>
+        </article>
+        <article class="car-controls panel">
+          <label>Train Info:</label>
+          <select class="btn-game" id="train-select" onchange="selectTrain()">
+
+          </select>
+          <button type="button" class="btn-game" onclick="deleteTrain()">Delete Train</button>
+        </article>
+        <article class="purchase panel">
+          <label>Purchase a new Train:</label>
+          <select class="btn-game" id="train-type-select">
+            <option>Small</option>
+            <option>Medium</option>
+            <option>Large</option>
+          </select>
+          <label>Train name:</label>
+          <input type="text" id="locomotiveName">
+          <button type="button" class="btn-game wide-button" onclick="purchaseTrain()">Purchase</button>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>

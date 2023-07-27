@@ -38,7 +38,7 @@ namespace BuildATrain.Controllers
 
         [HttpPost]
         [Route("add/train")]
-        public async Task<IActionResult> AddTrain(PostAddTrainRequest postAddTrainRequest)
+        public async Task<IActionResult> AddTrain([FromBody] PostAddTrainRequest postAddTrainRequest)
         {
             var locomotiveSize = postAddTrainRequest.LocomotiveType.ToString();
             var locomotiveType = (int)postAddTrainRequest.LocomotiveType;
@@ -59,12 +59,14 @@ namespace BuildATrain.Controllers
             var response = new PostAddTrainResponse();
             response.NewGameModel = game;
 
+            await _gameManagementService.UpdateModel(postAddTrainRequest.Email);
+
             return Ok(value: response);
         }
 
         [HttpPost]
         [Route("add/car")]
-        public async Task<IActionResult> AddCar(PostAddCarRequest postAddCarRequest)
+        public async Task<IActionResult> AddCar([FromBody] PostAddCarRequest postAddCarRequest)
         {
             try
             {
@@ -105,7 +107,7 @@ namespace BuildATrain.Controllers
         {
             await _gameManagementService.LoadGame(getLoadGameRequest.Email);
 
-            return Ok(value: new GetLoadGameResponse());
+            return Ok(value: await _gameManagementService.GetUserGameModel(getLoadGameRequest.Email));
         }
 
         #endregion
@@ -118,7 +120,7 @@ namespace BuildATrain.Controllers
 
         [HttpDelete]
         [Route("remove/train")]
-        public async Task<IActionResult> RemoveTrain(DeleteRemoveTrainRequest deleteRemoveTrainRequest)
+        public async Task<IActionResult> RemoveTrain([FromBody] DeleteRemoveTrainRequest deleteRemoveTrainRequest)
         {
             var email = deleteRemoveTrainRequest.Email;
             var locomotiveName = deleteRemoveTrainRequest.LocomotiveName;
@@ -133,6 +135,8 @@ namespace BuildATrain.Controllers
             var game = await GetNewGame(email);
             var response = new DeleteRemoveTrainResponse();
             response.NewGameModel = game;
+
+            await _gameManagementService.UpdateModel(deleteRemoveTrainRequest.Email);
 
             return Ok(value: response);
         }
@@ -155,6 +159,8 @@ namespace BuildATrain.Controllers
             var playerTrains = await _trainRepository.GetPlayerTrainsByEmailAsync(email);
 
             var train = playerTrains.FirstOrDefault(t => t.LocomotiveName == locomotiveName);
+
+            await _gameManagementService.UpdateModel(deleteRemoveCarRequest.Email);
 
             return Ok(value: train);
         }
