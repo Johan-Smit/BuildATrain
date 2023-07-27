@@ -1,15 +1,15 @@
 const apiHost = 'http://localhost:5023';
 
 const locomotiveTypes = {
-  Small: 0,
-  Medium: 1,
-  Large: 2
+  Small: 1,
+  Medium: 2,
+  Large: 3
 }
 
 const carTypes = {
-  Passenger: 0,
-  Cargo: 1, 
-  Fuel: 2
+  Passenger: 4,
+  Cargo: 5, 
+  Fuel: 6
 }
 
 let game;
@@ -64,7 +64,7 @@ async function purchasePassenger(){
         'Authorization': `Bearer ${token}`
       },
       body: {
-        'username': '',
+        'username': user,
         'locomotiveName': trainName,
         'carType': carTypes.Passenger
       }
@@ -82,10 +82,10 @@ async function purchaseCargo(){
       mode: 'cors',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+        'Authorization': `Bearer ${token}`
       },
       body: {
-        'username': '',
+        'username': user,
         'locomotiveName': trainName,
         'carType': carTypes.Cargo
       }
@@ -103,10 +103,10 @@ async function purchaseFuel(){
       mode: 'cors',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+        'Authorization': `Bearer ${token}`
       },
       body: {
-        'username': '',
+        'username': user,
         'locomotiveName': trainName,
         'carType': carTypes.Fuel
       }
@@ -118,18 +118,34 @@ async function purchaseFuel(){
 };
 
 async function purchaseTrain(){
+  trainType = document.getElementById('train-type-select').selectedOptions[0].innerText;
+  let locomotiveType;
+  switch (trainType) {
+    case 'Small':
+      locomotiveType = locomotiveTypes.Small;
+      break;
+
+    case 'Medium':
+      locomotiveType = locomotiveTypes.Medium;
+      break;
+
+    default:
+      locomotiveType = locomotiveTypes.Large;
+      break;
+  }
+
   try{
     const response = await fetch(`${apiHost}/game/add/car`, {
       method: 'POST',
       mode: 'cors',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+        'Authorization': `Bearer ${token}`
       },
       body: {
-        'username': '',
+        'username': user,
         'locomotiveName': trainName,
-        'locomotiveType': 0
+        'locomotiveType': locomotiveType
       }
     });
   }
@@ -145,10 +161,10 @@ async function deleteTrain(){
       mode: 'cors',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+        'Authorization': `Bearer ${token}`
       },
       body: {
-        'username': '',
+        'username': user,
         'locomotiveName': trainName
       }
     });
@@ -165,10 +181,10 @@ async function deletePassenger(){
       mode: 'cors',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+        'Authorization': `Bearer ${token}`
       },
       body: {
-        'username': '',
+        'username': user,
         'locomotiveName': trainName,
         'carType': carTypes.Passenger
       }
@@ -186,10 +202,10 @@ async function deleteCargo(){
       mode: 'cors',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+        'Authorization': `Bearer ${token}`
       },
       body: {
-        'username': '',
+        'username': user,
         'locomotiveName': trainName,
         'carType': carTypes.Cargo
       }
@@ -207,10 +223,10 @@ async function deleteFuel(){
       mode: 'cors',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+        'Authorization': `Bearer ${token}`
       },
       body: {
-        'username': '',
+        'username': user,
         'locomotiveName': trainName,
         'carType': carTypes.Fuel
       }

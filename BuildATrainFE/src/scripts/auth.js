@@ -17,7 +17,6 @@ const oauthToken = getCookie('oauth_token');
 
 // Update the HTML element with the token message
 if (oauthToken) {
-    document.getElementById('tokenMessage').textContent = `OAuth Token: ${oauthToken}`;
     sessionStorage.setItem('token', oauthToken);
 } else {
     window.location.href='/login';
