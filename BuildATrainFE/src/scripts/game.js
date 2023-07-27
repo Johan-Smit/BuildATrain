@@ -20,6 +20,13 @@ let token;
 
 let email;
 
+function changeSelected(newTrainName) {
+  const trainList = document.getElementById('train-select');
+  const options = Array.from(trainList.options);
+  const optionToSelect = options.find(item => item.text === newTrainName);
+  optionToSelect.selected = true;
+};
+
 function selectTrain(){
   trainName = document.getElementById('train-select').selectedOptions[0].innerText;
   updateTrain(game.gameModel.trains.find((train) => { train.locomotiveName === trainName}));
@@ -182,7 +189,7 @@ async function purchaseTrain(){
 
   try{
 
-    const response = await fetch(`${apiHost}/game/add/car`, {
+    const response = await fetch(`${apiHost}/game/add/train`, {
       method: 'POST',
       mode: 'cors',
       headers: {
@@ -214,6 +221,8 @@ async function purchaseTrain(){
       trainList.appendChild(option);
     });
 
+    changeSelected(locomotiveName);
+
   }
   catch(error) {
     console.error(error);
@@ -243,10 +252,6 @@ async function deleteTrain(){
       }
     }
 
-    if (game.gameModel.trains) {
-      updateTrain(game.gameModel.trains[0]);
-    }
-
     const trainList = document.getElementById('train-select');
     trainList.options.length = 0;
 
@@ -255,6 +260,11 @@ async function deleteTrain(){
       option.textContent = train.locomotiveName;
       trainList.appendChild(option);
     });
+
+    if (game.gameModel.trains) {
+      updateTrain(game.gameModel.trains[0]);
+      changeSelected(game.gameMode.trains[0].locomotiveName);
+    }
 
   }
   catch(error) {
