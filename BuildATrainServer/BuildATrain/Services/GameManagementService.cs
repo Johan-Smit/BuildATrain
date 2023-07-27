@@ -123,7 +123,7 @@ namespace BuildATrain.Services
 
         private async Task RunGameLoop(string email)
         {
-            string? loopDuration = "5000";
+            string? loopDuration = "10000";
 
             if (loopDuration != null)
             {
@@ -188,16 +188,16 @@ namespace BuildATrain.Services
                             newWallet = Convert.ToDouble(currentWallet.CurrentWallet) + income;
                             currentWallet.CurrentWallet = decimal.Round(Convert.ToDecimal(newWallet));
 
-                            //await ((IRepository<WalletModel>)scopedWalletRepoService).UpdateAsync(currentWallet);
+                            await ((IRepository<WalletModel>)scopedWalletRepoService).UpdateAsync(currentWallet);
 
                         }
 
-                        var retList = new List<KeyValuePair<string, string>>();
-                        retList.Add(new KeyValuePair<string, string>
-                        (
-                            "wallet",
-                            income.ToString()
-                        ));
+                        //var retList = new List<KeyValuePair<string, string>>();
+                        //retList.Add(new KeyValuePair<string, string>
+                        //(
+                        //    "wallet",
+                        //    income.ToString()
+                        //));
 
                         //await SendSSEEventAsync(clientGuidMapping.First(c => c.Value == gameModel.Email).Key, new UpdateGameEvent { Response = retList });
                         await SendSSEEventAsync(clientGuidMapping.First(c => c.Value == gameModel.Email).Key, new List<string> { newWallet.ToString(), income.ToString() });
