@@ -1,5 +1,6 @@
 ﻿using BuildATrain.Common;
 using BuildATrain.Database.Repositories;
+using BuildATrain.Database.Repositories.NewFolder;
 using BuildATrain.Models.Game;
 using BuildATrain.Models.Http.Request;
 using BuildATrain.Models.Http.Response;
@@ -65,22 +66,33 @@ namespace BuildATrain.Controllers
         [Route("add/car")]
         public async Task<IActionResult> AddCar(PostAddCarRequest postAddCarRequest)
         {
-            var email = postAddCarRequest.Email;
-            var locomotiveName = postAddCarRequest.LocomotiveName;
-            var carType = postAddCarRequest.CarType;
+            try
+            {
+                var email = postAddCarRequest.Email;
+                var locomotiveName = postAddCarRequest.LocomotiveName;
+                var carType = postAddCarRequest.CarType;
 
-            var isAdded = await AddCarAsync(email, locomotiveName, carType);
+                var isAdded = await AddCarAsync(email, locomotiveName, carType);
 
-            if (!isAdded)
+                if (!isAdded)
+                {
+                    return NotFound();
+                }
+
+                var playerTrains = await _trainRepository.GetPlayerTrainsByEmailAsync(email);
+
+                var train = playerTrains.FirstOrDefault(t => t.LocomotiveName == locomotiveName);
+
+                return Ok(value: train);
+            }
+            catch (PlayerTrainsNotFoundException ex)
             {
                 return NotFound();
             }
-
-            var playerTrains = await _trainRepository.GetPlayerTrainsByEmailAsync(email);
-
-            var train = playerTrains.FirstOrDefault(t => t.LocomotiveName == locomotiveName);
-
-            return Ok(value: train);
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error.");
+            }
         }
 
         #endregion
@@ -165,17 +177,28 @@ namespace BuildATrain.Controllers
 
         private async Task<bool> AddCarAsync(string email, string locomotiveName, CarType carType)
         {
-            var playerTrains = await _trainRepository.GetPlayerTrainsByEmailAsync(email);
-
-            var train = playerTrains.FirstOrDefault(t => t.LocomotiveName == locomotiveName);
-
-            if (train == null)
+            try
             {
-                return false;
-            }
+                var playerTrains = await _trainRepository.GetPlayerTrainsByEmailAsync(email);
 
-            await _trainRepository.UpdateCarCountAsync(train.TrainId, carType, 1, email);
-            return true;
+                var train = playerTrains.FirstOrDefault(t => t.LocomotiveName == locomotiveName);
+
+                if (train == null)
+                {
+                    return false;
+                }
+
+                await _trainRepository.UpdateCarCountAsync(train.TrainId, carType, 1, email);
+                return true;
+            }
+            catch (PlayerTrainsNotFoundException ex)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
 
         private async Task<bool> RemoveCarAsync(string email, string locomotiveName, CarType carType)
