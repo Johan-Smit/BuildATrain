@@ -18,14 +18,15 @@ namespace BuildATrain.Services
 
         private readonly IRepository<TrainModel> _trainRepository;
         private static IRepository<Attributes> _attributeRepository;
-        
+        private static IRepository<WalletModel> _walletRepository;
+
         private readonly IServiceScopeFactory _scopeFactory;
 
         #endregion
 
         #region Ctor
 
-        public GameManagementService(IEventsService eventsService, IRepository<TrainModel> trainRepositor, IRepository<Attributes> attributeRepository, IServiceScopeFactory scopeFactory) : base (eventsService)
+        public GameManagementService(IEventsService eventsService, IRepository<TrainModel> trainRepositor, IRepository<Attributes> attributeRepository, IServiceScopeFactory scopeFactory, IRepository<WalletModel> walletRepository) : base (eventsService)
         {
             if (loadedGames == null) loadedGames = new Dictionary<string, Thread>();
             if (clientGuidMapping == null) clientGuidMapping = new Dictionary<Guid, string>();
@@ -34,6 +35,7 @@ namespace BuildATrain.Services
             _trainRepository = trainRepositor;
             _attributeRepository = attributeRepository;
             _scopeFactory = scopeFactory;
+            _walletRepository = walletRepository;
         }
 
         #endregion
@@ -134,7 +136,10 @@ namespace BuildATrain.Services
                     {
                         var scope = _scopeFactory.CreateScope();
                         var scopedRepoService = scope.ServiceProvider.GetService(typeof(IRepository<Attributes>));
+                        var scopedWalletRepoService = scope.ServiceProvider.GetService(typeof(IRepository<WalletModel>));
+
                         double income = 0;
+                        double newWallet = 0;
 
                         foreach (var train in gameModel.Trains)
                         {
@@ -178,6 +183,13 @@ namespace BuildATrain.Services
                             income = new Random().NextDouble() * (incomeMaxRange - incomeMinRange) + incomeMinRange;
                             income *= distance;
 
+                            var currentWallet = await (scopedWalletRepoService as Repository<WalletModel>).GetCurrentWalletByEmail(email);
+
+                            newWallet = Convert.ToDouble(currentWallet.CurrentWallet) + income;
+                            currentWallet.CurrentWallet = decimal.Round(Convert.ToDecimal(newWallet));
+
+                            //await ((IRepository<WalletModel>)scopedWalletRepoService).UpdateAsync(currentWallet);
+
                         }
 
                         var retList = new List<KeyValuePair<string, string>>();
@@ -188,11 +200,11 @@ namespace BuildATrain.Services
                         ));
 
                         //await SendSSEEventAsync(clientGuidMapping.First(c => c.Value == gameModel.Email).Key, new UpdateGameEvent { Response = retList });
-                        await SendSSEEventAsync(clientGuidMapping.First(c => c.Value == gameModel.Email).Key, new List<string> { income.ToString(), gameModel.Trains.Count.ToString() });
+                        await SendSSEEventAsync(clientGuidMapping.First(c => c.Value == gameModel.Email).Key, new List<string> { newWallet.ToString(), income.ToString() });
                     }
                     catch (Exception e)
                     {
-
+                        Console.WriteLine(e.ToString());
                     }
 
                     Thread.Sleep(Convert.ToInt32(loopDuration));

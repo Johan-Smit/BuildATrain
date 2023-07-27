@@ -44,6 +44,7 @@ public class Program
 
     private static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
+
         services.AddCors(options =>
         {
             options.AddDefaultPolicy(policy =>
@@ -79,6 +80,7 @@ public class Program
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         services.AddScoped(typeof(IRepository<Attributes>), typeof(Repository<Attributes>));
         services.AddScoped(typeof(IRepository<TrainModel>), typeof(Repository<TrainModel>));
+        services.AddScoped(typeof(IRepository<WalletModel>), typeof(Repository<WalletModel>));
 
         services.AddTransient<GameManagementService>();
     }
