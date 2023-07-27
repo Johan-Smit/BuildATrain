@@ -18,7 +18,7 @@ let trainName;
 
 let token;
 
-let user;
+let email;
 
 function updateTrainName(){
   trainName = document.getElementById('train-select').selectedOptions[0].innerText;
@@ -26,7 +26,7 @@ function updateTrainName(){
 
 async function loadGame(){
   token = getCookie('oauth_token');
-  user = getCookie('email');
+  email = getCookie('email');
   try {
     const response = await fetch(`${apiHost}/game/load`, {
       method: 'GET',
@@ -36,7 +36,7 @@ async function loadGame(){
         'Authorization': `Bearer ${token}`
       },
       queryParams: {
-        'username': user
+        'email': email
       }
     });
     if (response?.ok) {
@@ -50,7 +50,7 @@ async function loadGame(){
     }
   }
   catch(error) {
-    console.log(error);
+    console.error(error);
   }
 };
 
@@ -64,7 +64,7 @@ async function purchasePassenger(){
         'Authorization': `Bearer ${token}`
       },
       body: {
-        'username': user,
+        'email': email,
         'locomotiveName': trainName,
         'carType': carTypes.Passenger
       }
@@ -85,7 +85,7 @@ async function purchaseCargo(){
         'Authorization': `Bearer ${token}`
       },
       body: {
-        'username': user,
+        'email': email,
         'locomotiveName': trainName,
         'carType': carTypes.Cargo
       }
@@ -106,7 +106,7 @@ async function purchaseFuel(){
         'Authorization': `Bearer ${token}`
       },
       body: {
-        'username': user,
+        'email': email,
         'locomotiveName': trainName,
         'carType': carTypes.Fuel
       }
@@ -143,7 +143,7 @@ async function purchaseTrain(){
         'Authorization': `Bearer ${token}`
       },
       body: {
-        'username': user,
+        'email': email,
         'locomotiveName': trainName,
         'locomotiveType': locomotiveType
       }
@@ -164,7 +164,7 @@ async function deleteTrain(){
         'Authorization': `Bearer ${token}`
       },
       body: {
-        'username': user,
+        'email': email,
         'locomotiveName': trainName
       }
     });
@@ -184,7 +184,7 @@ async function deletePassenger(){
         'Authorization': `Bearer ${token}`
       },
       body: {
-        'username': user,
+        'email': email,
         'locomotiveName': trainName,
         'carType': carTypes.Passenger
       }
@@ -205,7 +205,7 @@ async function deleteCargo(){
         'Authorization': `Bearer ${token}`
       },
       body: {
-        'username': user,
+        'email': email,
         'locomotiveName': trainName,
         'carType': carTypes.Cargo
       }
@@ -226,11 +226,14 @@ async function deleteFuel(){
         'Authorization': `Bearer ${token}`
       },
       body: {
-        'username': user,
+        'email': email,
         'locomotiveName': trainName,
         'carType': carTypes.Fuel
       }
     });
+    if (response.ok){
+      const myJSON = await response.json();
+    }
   }
   catch(error) {
     console.error(error);
