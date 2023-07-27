@@ -28,6 +28,9 @@ let brTurn:CanvasImageSource;
 let trainHead:CanvasImageSource;
 let smoke:CanvasImageSource;
 
+let smallTrain:CanvasImageSource;
+let medTrain:CanvasImageSource;
+let largeTrain:CanvasImageSource;
 let fuelCart:CanvasImageSource;
 let cargoCart:CanvasImageSource;
 let passangerCart:CanvasImageSource;
@@ -42,13 +45,21 @@ let trackSize: number = 10;
 
 let cartScale:number = 0.20;
 let cartFollowingDistance:number;
-let locomotiveChoice: string = "small";
+let locomotiveChoice: string;
 let cartsBought: CanvasImageSource[] = [];//Everytime a user buys a cart it must be added to this array
 
-//TODO: smoke and some decorations
+interface Train
+{
+    trainId:number,
+    locomotiveTypeId: number,
+    locomotiveName: string,
+    numPassengerCars: number,
+    numCargoCars: number,
+    numFuelCars: number
+}
 
 
-//TODO: see how I autoresized canvas from prev project
+
 function loadImage(url:string):Promise<CanvasImageSource>
 {
     return new Promise((resolve, reject) => {
@@ -78,28 +89,9 @@ async function loadAllImages()
     trTurn = await loadImage('./images/trainTracks/topRightTurn.png');
     brTurn = await loadImage('./images/trainTracks/bottomRightTurn.png');
 
-    //TODO: User chooses the small/med/large locomotive option here
-    switch (locomotiveChoice) {
-        case "small":
-            trainHead = await loadImage('./images/trainParts/locomotiveSmall.png');
-            trainScale = 0.18;
-            cartFollowingDistance = 25;
-            break;
-    
-        case "medium":
-            trainHead = await loadImage('./images/trainParts/locomotiveMedium.png');
-            trainScale = 0.2;
-            cartFollowingDistance = 30;
-            
-            break;
-        
-        case "large":
-            trainHead = await loadImage('./images/trainParts/locomotiveLarge.png');
-            trainScale = 0.22;
-            cartFollowingDistance = 43;
-            
-            break;
-    }
+    smallTrain = await loadImage('./images/trainParts/locomotiveSmall.png');
+    medTrain = await loadImage('./images/trainParts/locomotiveMedium.png');
+    largeTrain = await loadImage('./images/trainParts/locomotiveLarge.png');
 
     fuelCart = await loadImage('./images/trainParts/fuelCart.png');
     cargoCart = await loadImage('./images/trainParts/cargoCart.png');
@@ -107,9 +99,34 @@ async function loadAllImages()
 
     smoke = await loadImage('./images/trainParts/smoke.png');
 
-    cartsBought.push(fuelCart);
-    cartsBought.push(passangerCart);
-    cartsBought.push(cargoCart);
+
+    //TODO: User chooses the small/med/large locomotive option here
+    // switch (locomotiveChoice) {
+    //     case "small":
+    //         trainScale = 0.18;
+    //         cartFollowingDistance = 25;
+    //         break;
+    
+    //     case "medium":
+    //         trainHead = await loadImage('./images/trainParts/locomotiveMedium.png');
+    //         trainScale = 0.2;
+    //         cartFollowingDistance = 30;
+            
+    //         break;
+        
+    //     case "large":
+    //         trainHead = await loadImage('./images/trainParts/locomotiveLarge.png');
+    //         trainScale = 0.22;
+    //         cartFollowingDistance = 43;
+            
+    //         break;
+    // }
+
+
+
+    // cartsBought.push(fuelCart);
+    // cartsBought.push(passangerCart);
+    // cartsBought.push(cargoCart);
 
     // cartsBought.push(fuelCart);
     // cartsBought.push(passangerCart);
@@ -379,6 +396,10 @@ async function drawImageRotated(
 }
 
 async function drawTrain() {
+    if(trainHead == undefined)
+    {
+        return;
+    }
 
     if(trainCurrPos >= trainRouteSize-1)
     {
@@ -399,7 +420,7 @@ async function drawTrain() {
 
     let cart:CanvasImageSource;
     let cartPosition:number;
-    let firstCartPos:number;
+    let firstCartPos:number = 0;
     for (let index = 0; index < cartsBought.length; index++) {
         cart = cartsBought[index];
         if(index == 0)
@@ -434,13 +455,19 @@ async function drawGame()
 
 }
 
+function updateTrain(trainsInfo:Train)
+{
+
+    console.log(trainsInfo);
+
+
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
     await setupComponents();
     window.requestAnimationFrame(eventLoop);
-    // drawGame();
 
 });
-
 
 function eventLoop(timeStamp:number)
 {
