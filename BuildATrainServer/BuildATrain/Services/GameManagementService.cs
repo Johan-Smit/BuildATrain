@@ -14,6 +14,7 @@ namespace BuildATrain.Services
 
         private static Dictionary<string, Thread> loadedGames;
         private static Dictionary<Guid, string> clientGuidMapping;
+        private static Dictionary<string, GameModel> clientGameMapping;
 
         private readonly IRepository<TrainModel> _trainRepository;
         private static IRepository<Attributes> _attributeRepository;
@@ -26,8 +27,10 @@ namespace BuildATrain.Services
 
         public GameManagementService(IEventsService eventsService, IRepository<TrainModel> trainRepositor, IRepository<Attributes> attributeRepository, IServiceScopeFactory scopeFactory) : base (eventsService)
         {
-            loadedGames = new Dictionary<string, Thread>();
-            clientGuidMapping = new Dictionary<Guid, string>();
+            if (loadedGames == null) loadedGames = new Dictionary<string, Thread>();
+            if (clientGuidMapping == null) clientGuidMapping = new Dictionary<Guid, string>();
+            if (clientGameMapping == null) clientGameMapping = new Dictionary<string, GameModel>();
+
             _trainRepository = trainRepositor;
             _attributeRepository = attributeRepository;
             _scopeFactory = scopeFactory;
@@ -47,7 +50,9 @@ namespace BuildATrain.Services
                 gameModel.Email = userID;
                 gameModel.Trains = trainModels.ToList();
 
-                loadedGames.Add(userID, new Thread(() => RunGameLoop(gameModel)));
+                clientGameMapping.Add(userID, gameModel);
+
+                loadedGames.Add(userID, new Thread(() => RunGameLoop(userID)));
                 loadedGames[userID].Start();
             }
             else
@@ -70,6 +75,30 @@ namespace BuildATrain.Services
             }
         }
 
+        public async Task<GameModel> GetUserGameModel(string email)
+        {
+            var trainModels = await _trainRepository.GetPlayerTrainsByEmailAsync(email);
+            GameModel gameModel = new GameModel();
+
+            gameModel.Email = email;
+            gameModel.Trains = trainModels.ToList();
+
+            return gameModel;
+        }
+
+        public async Task UpdateModel(string userID)
+        {
+            var trainModels = await _trainRepository.GetPlayerTrainsByEmailAsync(userID);
+            GameModel gameModel = new GameModel();
+
+            gameModel.Email = userID;
+            gameModel.Trains = trainModels.ToList();
+
+            clientGameMapping.Remove(userID);
+
+            clientGameMapping.Add(userID, gameModel);
+        }
+
         public void PauseAllGames()
         {
             foreach (KeyValuePair<string, Thread> loadedGame in loadedGames)
@@ -90,7 +119,7 @@ namespace BuildATrain.Services
 
         #region Private
 
-        private async Task RunGameLoop(GameModel gameModel)
+        private async Task RunGameLoop(string email)
         {
             string? loopDuration = "5000";
 
@@ -98,6 +127,9 @@ namespace BuildATrain.Services
             {
                 while (true)
                 {
+
+                    GameModel gameModel = clientGameMapping[email];
+
                     try
                     {
                         var scope = _scopeFactory.CreateScope();
@@ -156,7 +188,7 @@ namespace BuildATrain.Services
                         ));
 
                         //await SendSSEEventAsync(clientGuidMapping.First(c => c.Value == gameModel.Email).Key, new UpdateGameEvent { Response = retList });
-                        await SendSSEEventAsync(clientGuidMapping.First(c => c.Value == gameModel.Email).Key, new List<string> { income.ToString() });
+                        await SendSSEEventAsync(clientGuidMapping.First(c => c.Value == gameModel.Email).Key, new List<string> { income.ToString(), gameModel.Trains.Count.ToString() });
                     }
                     catch (Exception e)
                     {

@@ -58,6 +58,8 @@ namespace BuildATrain.Controllers
             var response = new PostAddTrainResponse();
             response.NewGameModel = game;
 
+            await _gameManagementService.UpdateModel(postAddTrainRequest.Email);
+
             return Ok(value: response);
         }
 
@@ -80,6 +82,8 @@ namespace BuildATrain.Controllers
 
             var train = playerTrains.FirstOrDefault(t => t.LocomotiveName == locomotiveName);
 
+            await _gameManagementService.UpdateModel(postAddCarRequest.Email);
+
             return Ok(value: train);
         }
 
@@ -93,7 +97,7 @@ namespace BuildATrain.Controllers
         {
             await _gameManagementService.LoadGame(getLoadGameRequest.Email);
 
-            return Ok(value: new GetLoadGameResponse());
+            return Ok(value: await _gameManagementService.GetUserGameModel(getLoadGameRequest.Email));
         }
 
         #endregion
@@ -122,6 +126,8 @@ namespace BuildATrain.Controllers
             var response = new DeleteRemoveTrainResponse();
             response.NewGameModel = game;
 
+            await _gameManagementService.UpdateModel(deleteRemoveTrainRequest.Email);
+
             return Ok(value: response);
         }
 
@@ -143,6 +149,8 @@ namespace BuildATrain.Controllers
             var playerTrains = await _trainRepository.GetPlayerTrainsByEmailAsync(email);
 
             var train = playerTrains.FirstOrDefault(t => t.LocomotiveName == locomotiveName);
+
+            await _gameManagementService.UpdateModel(deleteRemoveCarRequest.Email);
 
             return Ok(value: train);
         }
