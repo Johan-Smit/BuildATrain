@@ -224,9 +224,9 @@ async function purchaseTrain(){
       if (myJSON.trains) {
         game.trains = myJSON.trains;
       }
+      updateTrain(game.trains.find((train) => train.locomotiveName === locomotiveName));
+      changeSelected(locomotiveName);
     }
-
-    updateTrain(game.trains.find((train) => train.locomotiveName === locomotiveName));
 
     const trainList = document.getElementById('train-select');
     trainList.options.length = 0;
@@ -236,8 +236,6 @@ async function purchaseTrain(){
       option.textContent = train.locomotiveName;
       trainList.appendChild(option);
     });
-
-    changeSelected(locomotiveName);
 
   }
   catch(error) {
