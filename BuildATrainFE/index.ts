@@ -80,7 +80,7 @@ app.get(
   passport.authenticate('google', { failureRedirect: '/login' }),
   (req, res) => {
     // Successful authentication, redirect home.
-    res.cookie('user', req.user);
+    res.cookie('oauth_token', req.session.passport.user.accessToken, { httpOnly: true, secure: true, sameSite: 'strict' });
     res.redirect('/game');
   }
 );
