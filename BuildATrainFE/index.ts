@@ -98,6 +98,10 @@ app.get('/some-route', ensureAuthenticated, (req: express.Request, res: express.
   } 
 });
 
+app.get('/game', ensureAuthenticated, (req: express.Request, res: express.Response) => {
+  res.sendFile(__dirname + '/src/game.html');
+});
+
 
 
 app.listen(4000, () => {
