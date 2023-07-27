@@ -14,23 +14,28 @@ namespace BuildATrain.Services
 
         private static Dictionary<string, Thread> loadedGames;
         private static Dictionary<Guid, string> clientGuidMapping;
+        private static Dictionary<string, GameModel> clientGameMapping;
 
         private readonly IRepository<TrainModel> _trainRepository;
         private static IRepository<Attributes> _attributeRepository;
-        
+        private static IRepository<WalletModel> _walletRepository;
+
         private readonly IServiceScopeFactory _scopeFactory;
 
         #endregion
 
         #region Ctor
 
-        public GameManagementService(IEventsService eventsService, IRepository<TrainModel> trainRepositor, IRepository<Attributes> attributeRepository, IServiceScopeFactory scopeFactory) : base (eventsService)
+        public GameManagementService(IEventsService eventsService, IRepository<TrainModel> trainRepositor, IRepository<Attributes> attributeRepository, IServiceScopeFactory scopeFactory, IRepository<WalletModel> walletRepository) : base (eventsService)
         {
-            loadedGames = new Dictionary<string, Thread>();
-            clientGuidMapping = new Dictionary<Guid, string>();
+            if (loadedGames == null) loadedGames = new Dictionary<string, Thread>();
+            if (clientGuidMapping == null) clientGuidMapping = new Dictionary<Guid, string>();
+            if (clientGameMapping == null) clientGameMapping = new Dictionary<string, GameModel>();
+
             _trainRepository = trainRepositor;
             _attributeRepository = attributeRepository;
             _scopeFactory = scopeFactory;
+            _walletRepository = walletRepository;
         }
 
         #endregion
@@ -47,7 +52,9 @@ namespace BuildATrain.Services
                 gameModel.Email = userID;
                 gameModel.Trains = trainModels.ToList();
 
-                loadedGames.Add(userID, new Thread(() => RunGameLoop(gameModel)));
+                clientGameMapping.Add(userID, gameModel);
+
+                loadedGames.Add(userID, new Thread(() => RunGameLoop(userID)));
                 loadedGames[userID].Start();
             }
             else
@@ -70,6 +77,30 @@ namespace BuildATrain.Services
             }
         }
 
+        public async Task<GameModel> GetUserGameModel(string email)
+        {
+            var trainModels = await _trainRepository.GetPlayerTrainsByEmailAsync(email);
+            GameModel gameModel = new GameModel();
+
+            gameModel.Email = email;
+            gameModel.Trains = trainModels.ToList();
+
+            return gameModel;
+        }
+
+        public async Task UpdateModel(string userID)
+        {
+            var trainModels = await _trainRepository.GetPlayerTrainsByEmailAsync(userID);
+            GameModel gameModel = new GameModel();
+
+            gameModel.Email = userID;
+            gameModel.Trains = trainModels.ToList();
+
+            clientGameMapping.Remove(userID);
+
+            clientGameMapping.Add(userID, gameModel);
+        }
+
         public void PauseAllGames()
         {
             foreach (KeyValuePair<string, Thread> loadedGame in loadedGames)
@@ -90,19 +121,25 @@ namespace BuildATrain.Services
 
         #region Private
 
-        private async Task RunGameLoop(GameModel gameModel)
+        private async Task RunGameLoop(string email)
         {
-            string? loopDuration = "5000";
+            string? loopDuration = "10000";
 
             if (loopDuration != null)
             {
                 while (true)
                 {
+
+                    GameModel gameModel = clientGameMapping[email];
+
                     try
                     {
                         var scope = _scopeFactory.CreateScope();
                         var scopedRepoService = scope.ServiceProvider.GetService(typeof(IRepository<Attributes>));
+                        var scopedWalletRepoService = scope.ServiceProvider.GetService(typeof(IRepository<WalletModel>));
+
                         double income = 0;
+                        double newWallet = 0;
 
                         foreach (var train in gameModel.Trains)
                         {
@@ -146,21 +183,28 @@ namespace BuildATrain.Services
                             income = new Random().NextDouble() * (incomeMaxRange - incomeMinRange) + incomeMinRange;
                             income *= distance;
 
+                            var currentWallet = await (scopedWalletRepoService as Repository<WalletModel>).GetCurrentWalletByEmail(email);
+
+                            newWallet = Convert.ToDouble(currentWallet.CurrentWallet) + income;
+                            currentWallet.CurrentWallet = decimal.Round(Convert.ToDecimal(newWallet));
+
+                            await ((IRepository<WalletModel>)scopedWalletRepoService).UpdateAsync(currentWallet);
+
                         }
 
-                        var retList = new List<KeyValuePair<string, string>>();
-                        retList.Add(new KeyValuePair<string, string>
-                        (
-                            "wallet",
-                            income.ToString()
-                        ));
+                        //var retList = new List<KeyValuePair<string, string>>();
+                        //retList.Add(new KeyValuePair<string, string>
+                        //(
+                        //    "wallet",
+                        //    income.ToString()
+                        //));
 
                         //await SendSSEEventAsync(clientGuidMapping.First(c => c.Value == gameModel.Email).Key, new UpdateGameEvent { Response = retList });
-                        await SendSSEEventAsync(clientGuidMapping.First(c => c.Value == gameModel.Email).Key, new List<string> { income.ToString() });
+                        await SendSSEEventAsync(clientGuidMapping.First(c => c.Value == gameModel.Email).Key, new List<string> { newWallet.ToString(), income.ToString() });
                     }
                     catch (Exception e)
                     {
-
+                        Console.WriteLine(e.ToString());
                     }
 
                     Thread.Sleep(Convert.ToInt32(loopDuration));
@@ -176,7 +220,18 @@ namespace BuildATrain.Services
         {
             if (e.Request.Query.Any(q => q.Key == "email"))
             {
-                clientGuidMapping.Add(e.Client.Id, e.Request.Query.First(q => q.Key == "email").Value);
+                if (!clientGuidMapping.ContainsKey(e.Client.Id)) clientGuidMapping.Add(e.Client.Id, e.Request.Query.First(q => q.Key == "email").Value);
+                else
+                {
+                    
+                    foreach (var client in clientGuidMapping)
+                    {
+                        if (client.Value == e.Request.Query.First(q => q.Key == "email").Value)
+                            clientGuidMapping.Remove(client.Key);
+                    }
+
+                    clientGuidMapping[e.Client.Id] = e.Request.Query.First(q => q.Key == "email").Value;
+                }
             }
             else
             {

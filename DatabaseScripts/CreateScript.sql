@@ -34,7 +34,7 @@ CREATE TABLE Players (
   Id INT IDENTITY(1,1) PRIMARY KEY,
   Username VARCHAR(50),
   Email NVARCHAR(255),
-  CurrentWallet DECIMAL(18,2)
+  CurrentWallet DECIMAL(18,2) DEFAULT (11500.00)
 );
 GO
 

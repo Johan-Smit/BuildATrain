@@ -80,13 +80,19 @@ app.get(
   passport.authenticate('google', { failureRedirect: '/login' }),
   (req, res) => {
     // Successful authentication, redirect home.
-    res.redirect('/');
+    res.cookie('oauth_token', req.session.passport.user.accessToken, { httpOnly: false, secure: true, sameSite: 'strict' });
+    res.cookie('email', req.session.passport.user.email, { httpOnly: false, secure: true, sameSite: 'strict' });
+    res.redirect('/game');
   }
 );
 
 // Login route
 app.get('/login', (req, res) => {
   res.sendFile(__dirname + '/src/login.html');
+});
+
+app.get('/', (req, res) => {
+  res.redirect('/login');
 });
 
 app.get('/some-route', ensureAuthenticated, (req: express.Request, res: express.Response) => {
@@ -97,8 +103,10 @@ app.get('/some-route', ensureAuthenticated, (req: express.Request, res: express.
   } 
 });
 
+app.get('/game', ensureAuthenticated, (req: express.Request, res: express.Response) => {
+  res.sendFile(__dirname + '/src/game.html');
+});
 
-
-app.listen(4000, () => {
+app.listen(port, () => {
   console.log('Server is running on port 4000');
 });

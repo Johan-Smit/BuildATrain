@@ -1,5 +1,7 @@
 ﻿using BuildATrain.Common;
 using BuildATrain.Database.Models;
+using BuildATrain.Database.Repositories.Exceptions;
+using BuildATrain.Database.Repositories.NewFolder;
 using BuildATrain.Models.Game;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -50,12 +52,20 @@ namespace BuildATrain.Database.Repositories
 
         public async Task<IEnumerable<TrainModel>> GetPlayerTrainsByEmailAsync(string email)
         {
-            var emailParam = new SqlParameter("@Email", SqlDbType.NVarChar) { Value = email };
-            var result = await _context.Set<TrainModel>()
-                .FromSqlRaw("EXEC GetPlayerTrainsByEmail @Email", emailParam)
-                .ToListAsync();
+            try
+            {
+                var emailParam = new SqlParameter("@Email", SqlDbType.NVarChar) { Value = email };
+                var result = await _context.Set<TrainModel>()
+                    .FromSqlRaw("EXEC GetPlayerTrainsByEmail @Email", emailParam)
+                    .ToListAsync();
 
-            return result;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new PlayerTrainsNotFoundException($"Player trains not found for email '{email}'.", ex);
+            }
+            
         }
 
         public async Task<bool> InsertPlayerTrainAsync(string locomotiveSize, int locomotiveType, string locomotiveName, int numFuelCars, int numPassengerCars, int numCargoCars, string email)
@@ -85,12 +95,19 @@ namespace BuildATrain.Database.Repositories
 
         public async Task<Attributes> GetAttributesByAttributeIdAsync(int attributeId)
         {
-            var attributeIdParam = new SqlParameter("@AttributeId", SqlDbType.Int) { Value = attributeId };
-            var result = await _context.Set<Attributes>()
-                .FromSqlRaw("EXEC GetAttributesById @AttributeId", attributeIdParam)
-                .FirstAsync();
+            try
+            {
+                var attributeIdParam = new SqlParameter("@AttributeId", SqlDbType.Int) { Value = attributeId };
+                var result = await _context.Set<Attributes>()
+                    .FromSqlRaw("EXEC GetAttributesById @AttributeId", attributeIdParam)
+                    .FirstAsync();
 
-            return result;
+                return result;
+            }
+            catch (Exception ex) 
+            {
+                throw new AttributeNotfoundException($"Attribute id was not found: {attributeId}", ex);
+            }
         }
 
         public async Task<bool> UpdateCarCountAsync(int trainId, CarType carType, int count, string email)
@@ -132,31 +149,59 @@ namespace BuildATrain.Database.Repositories
 
         public async Task<WalletModel> GetCurrentWalletByEmail(string email)
         {
-            var emailParam = new SqlParameter("@Email", SqlDbType.NVarChar) { Value = email };
-            var result = await _context.Set<WalletModel>()
-                .FromSqlRaw("EXEC GetCurrentWalletByEmail @Email", emailParam)
-                .ToListAsync();
+            try
+            {
+                var emailParam = new SqlParameter("@Email", SqlDbType.NVarChar) { Value = email };
+                var result = await _context.Set<WalletModel>()
+                    .FromSqlRaw("EXEC GetCurrentWalletByEmail @Email", emailParam)
+                    .ToListAsync();
 
-            return result.FirstOrDefault();
+                if (result.Count == 0)
+                {
+
+                    var emailParamNew = new SqlParameter("@email", SqlDbType.NChar) { Value = email };
+
+                    await _context.Database.ExecuteSqlRawAsync("INSERT INTO Players (Username, Email) VALUES ('', @email)", emailParamNew);
+                }
+
+                result = await _context.Set<WalletModel>()
+                    .FromSqlRaw("EXEC GetCurrentWalletByEmail @Email", emailParam)
+                    .ToListAsync();
+
+                return result.FirstOrDefault();
+            }
+            catch(Exception ex)
+            {
+                throw new CurrentWalletNotFoundException($"CurrentWallet not found for: {email}", ex);
+            }
         }
 
         public async Task<bool> PreformPurchase(string email, int attributeId, decimal currentWallet)
         {
-            var emailParam = new SqlParameter("@Email", SqlDbType.VarChar) { Value = email };
-            var attributeIdParam = new SqlParameter("@AttributeId", SqlDbType.Int) { Value = attributeId };
-            var currentWalletParam = new SqlParameter("@CurrentWallet", SqlDbType.Decimal) { Value = currentWallet };
-            currentWalletParam.Precision = 18;
-            currentWalletParam.Scale = 2;
+            try
+            {
+                var emailParam = new SqlParameter("@Email", SqlDbType.VarChar) { Value = email };
+                var attributeIdParam = new SqlParameter("@AttributeId", SqlDbType.Int) { Value = attributeId };
+                var currentWalletParam = new SqlParameter("@CurrentWallet", SqlDbType.Decimal) { Value = currentWallet };
+                currentWalletParam.Precision = 18;
+                currentWalletParam.Scale = 2;
 
-            var successParam = new SqlParameter("@Success", SqlDbType.Bit) { Direction = ParameterDirection.Output };
-            var messageParam = new SqlParameter("@Message", SqlDbType.NVarChar, 255) { Direction = ParameterDirection.Output };
+                var successParam = new SqlParameter("@Success", SqlDbType.Bit) { Direction = ParameterDirection.Output };
+                var messageParam = new SqlParameter("@Message", SqlDbType.NVarChar, 255) { Direction = ParameterDirection.Output };
 
-            await _context.Database.ExecuteSqlRawAsync("EXEC PerformPurchaseByAttributeId @Email, @AttributeId, @CurrentWallet OUTPUT, @Success OUTPUT, @Message OUTPUT",
-                emailParam, attributeIdParam, currentWalletParam, successParam, messageParam);
+                await _context.Database.ExecuteSqlRawAsync("EXEC PerformPurchaseByAttributeId @Email, @AttributeId, @CurrentWallet OUTPUT, @Success OUTPUT, @Message OUTPUT",
+                    emailParam, attributeIdParam, currentWalletParam, successParam, messageParam);
 
-            var isSuccess = Convert.ToBoolean(successParam.Value);
+                var isSuccess = Convert.ToBoolean(successParam.Value);
 
-            return isSuccess;
+                return isSuccess;
+            }
+            catch(Exception ex)
+            {
+
+            }
+
+            return false;
         }
     }
 }
