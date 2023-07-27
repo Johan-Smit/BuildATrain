@@ -1,4 +1,4 @@
-const apiHost = 'http://localhost:5023';
+const apiHost = 'https://mn2r2ze2wx.us-east-1.awsapprunner.com';
 
 const locomotiveTypes = {
   Small: 1,
