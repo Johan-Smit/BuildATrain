@@ -208,7 +208,7 @@ namespace BuildATrain.Services
         {
             if (e.Request.Query.Any(q => q.Key == "email"))
             {
-                clientGuidMapping.Add(e.Client.Id, e.Request.Query.First(q => q.Key == "email").Value);
+                if (!clientGuidMapping.ContainsKey(e.Client.Id)) clientGuidMapping.Add(e.Client.Id, e.Request.Query.First(q => q.Key == "email").Value);
             }
             else
             {
