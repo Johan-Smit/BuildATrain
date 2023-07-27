@@ -204,8 +204,15 @@ async function purchaseTrain(){
     }
 
     updateTrain(game.gameModel.trains.find((train) => train.locomotiveName === locomotiveName));
-    
-    //TODO update train-select options
+
+    const trainList = document.getElementById('train-select');
+    trainList.options.length = 0;
+
+    game.gameModel.trains.map((train) => {
+      const option = document.createElement('option');
+      option.textContent = train.locomotiveName;
+      trainList.appendChild(option);
+    });
 
   }
   catch(error) {
@@ -240,7 +247,15 @@ async function deleteTrain(){
       updateTrain(game.gameModel.trains[0]);
     }
 
-    //TODO Update train-select options
+    const trainList = document.getElementById('train-select');
+    trainList.options.length = 0;
+
+    game.gameModel.trains.map((train) => {
+      const option = document.createElement('option');
+      option.textContent = train.locomotiveName;
+      trainList.appendChild(option);
+    });
+
   }
   catch(error) {
     console.error(error);
