@@ -12,6 +12,6 @@ public class DatabaseContext : DbContext
     //DbSets for models
     public DbSet<Attributes> Attributes { get; set; }
     public DbSet<TrainModel> TrainModels { get; set; }
-    public DbSet<WalletModel> WalletModels { get; set; }
+    public DbSet<WalletModel> Players { get; set; }
 
 }
