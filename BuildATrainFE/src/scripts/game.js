@@ -1,14 +1,14 @@
 const apiHost = 'http://localhost:5023';
 
 const locomotiveTypes = {
-  Small: 0,
-  Medium: 1,
-  Large: 2
+  Small: 1,
+  Medium: 2,
+  Large: 3
 }
 
 const carTypes = {
   Passenger: 0,
-  Cargo: 1, 
+  Cargo: 1,
   Fuel: 2
 }
 
@@ -73,6 +73,15 @@ async function purchasePassenger(){
   catch(error) {
     console.error(error);
   }
+
+  updateTrain({
+    trainId: 0,
+    locomotiveTypeId: locomotiveTypes.Large,
+    locomotiveName: "Thomas",
+    numPassengerCars: 5,
+    numCargoCars: 5,
+    numFuelCars: 5
+  });
 };
 
 async function purchaseCargo(){

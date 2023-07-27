@@ -179,7 +179,7 @@ function loadTrainRoute() {
             for (y = 0.85 * canvas.height + trackSize; y < canvas.height; y = y + trainIncrements) {
                 trainRoute.push([0.45 * canvas.width + trackSize, y, 3.14]);
             }
-            for (y = 1; y < 50; y = y + trainIncrements) {
+            for (y = 1; y < 15; y = y + trainIncrements) {
                 trainRoute.push([0, 0, -99]);
             }
             //Second half of route
@@ -201,7 +201,7 @@ function loadTrainRoute() {
             for (x = 0.8 * canvas.width + trackSize; x < canvas.width; x = x + trainIncrements) {
                 trainRoute.push([x, 0.2 * canvas.height, 1.57]);
             }
-            for (y = 1; y < 50; y = y + trainIncrements) {
+            for (y = 1; y < 15; y = y + trainIncrements) {
                 trainRoute.push([0, 0, -99]);
             }
             trainRouteSize = trainRoute.length;
@@ -385,15 +385,15 @@ function drawTrain() {
                     if (trainTimer % trainSpeed == 0) {
                         trainCurrPos += 1;
                     }
-                    if (trainRoute[trainCurrPos][2] == -99) {
-                        return [2 /*return*/];
-                    }
+                    if (!(trainRoute[trainCurrPos][2] != -99)) return [3 /*break*/, 3];
                     return [4 /*yield*/, drawImageRotated(trainHead, trainRoute[trainCurrPos][0], trainRoute[trainCurrPos][1], trainScale, trainRoute[trainCurrPos][2])];
                 case 1:
                     _a.sent();
                     return [4 /*yield*/, drawImageRotated(smoke, trainRoute[trainCurrPos][0], trainRoute[trainCurrPos][1], 0.1, trainRoute[trainCurrPos][2])];
                 case 2:
                     _a.sent();
+                    _a.label = 3;
+                case 3:
                     firstCartPos = 0;
                     for (index = 0; index < cartsBought.length; index++) {
                         cart = cartsBought[index];
@@ -405,6 +405,9 @@ function drawTrain() {
                             cartPosition = firstCartPos - ((index) * 30);
                         }
                         if (cartPosition > 0) {
+                            if (trainRoute[cartPosition][2] == -99) {
+                                continue;
+                            }
                             drawImageRotated(cart, trainRoute[cartPosition][0], trainRoute[cartPosition][1], cartScale, trainRoute[cartPosition][2]);
                         }
                     }
@@ -430,8 +433,11 @@ function drawGame() {
                     return [4 /*yield*/, drawTracks()];
                 case 4:
                     _a.sent();
-                    return [4 /*yield*/, drawTrain()];
+                    return [4 /*yield*/, loadTrainRoute()];
                 case 5:
+                    _a.sent();
+                    return [4 /*yield*/, drawTrain()];
+                case 6:
                     _a.sent();
                     return [2 /*return*/];
             }
@@ -440,6 +446,33 @@ function drawGame() {
 }
 function updateTrain(trainsInfo) {
     console.log(trainsInfo);
+    switch (trainsInfo.locomotiveTypeId) {
+        case 1:
+            trainHead = smallTrain;
+            trainScale = 0.18;
+            cartFollowingDistance = 25;
+            break;
+        case 2:
+            trainHead = medTrain;
+            trainScale = 0.2;
+            cartFollowingDistance = 30;
+            break;
+        case 3:
+            trainHead = largeTrain;
+            trainScale = 0.22;
+            cartFollowingDistance = 43;
+            break;
+    }
+    cartsBought = [];
+    for (var index = 0; index < trainsInfo.numCargoCars; index++) {
+        cartsBought.push(cargoCart);
+    }
+    for (var index = 0; index < trainsInfo.numFuelCars; index++) {
+        cartsBought.push(fuelCart);
+    }
+    for (var index = 0; index < trainsInfo.numPassengerCars; index++) {
+        cartsBought.push(passangerCart);
+    }
 }
 document.addEventListener("DOMContentLoaded", function () { return __awaiter(_this, void 0, void 0, function () {
     return __generator(this, function (_a) {
@@ -455,9 +488,7 @@ document.addEventListener("DOMContentLoaded", function () { return __awaiter(_th
 function eventLoop(timeStamp) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawGame();
-    // console.log(timeStamp);
     if (!gameDone) {
-        // window.setTimeout(eventLoop, intervalTime); 
         window.requestAnimationFrame(eventLoop);
     }
 }

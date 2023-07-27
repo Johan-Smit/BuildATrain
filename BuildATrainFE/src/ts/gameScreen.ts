@@ -167,7 +167,7 @@ async function loadTrainRoute()
         trainRoute.push([0.45*canvas.width+trackSize,y,3.14]);
     }
 
-    for (let y = 1; y < 50; y=y+trainIncrements) 
+    for (let y = 1; y < 15; y=y+trainIncrements) 
     {
         trainRoute.push([0,0,-99]);
     }
@@ -203,7 +203,7 @@ async function loadTrainRoute()
         trainRoute.push([ x,0.2*canvas.height,1.57]);
     }
     
-    for (let y = 1; y < 50; y=y+trainIncrements) 
+    for (let y = 1; y < 15; y=y+trainIncrements) 
     {
         trainRoute.push([0,0,-99]);
     }
@@ -410,13 +410,12 @@ async function drawTrain() {
     {
         trainCurrPos += 1; 
     }
-    if(trainRoute[trainCurrPos][2] == -99)
+    if(trainRoute[trainCurrPos][2] != -99)
     {
-        return;
+    
+        await drawImageRotated(trainHead,trainRoute[trainCurrPos][0],trainRoute[trainCurrPos][1],trainScale,trainRoute[trainCurrPos][2]);
+        await drawImageRotated(smoke,trainRoute[trainCurrPos][0],trainRoute[trainCurrPos][1],0.1,trainRoute[trainCurrPos][2]);
     }
-
-    await drawImageRotated(trainHead,trainRoute[trainCurrPos][0],trainRoute[trainCurrPos][1],trainScale,trainRoute[trainCurrPos][2]);
-    await drawImageRotated(smoke,trainRoute[trainCurrPos][0],trainRoute[trainCurrPos][1],0.1,trainRoute[trainCurrPos][2]);
 
     let cart:CanvasImageSource;
     let cartPosition:number;
@@ -435,6 +434,10 @@ async function drawTrain() {
         }
         if(cartPosition > 0)
         {
+            if(trainRoute[cartPosition][2] == -99)
+            {
+                continue;
+            }
             drawImageRotated(cart,trainRoute[cartPosition][0],trainRoute[cartPosition][1],cartScale,trainRoute[cartPosition][2]);
         }
         
@@ -451,15 +454,47 @@ async function drawGame()
     await drawTransitions();
 
     await drawTracks();
+    await loadTrainRoute();
     await drawTrain();
 
 }
 
 function updateTrain(trainsInfo:Train)
 {
-
     console.log(trainsInfo);
+      switch (trainsInfo.locomotiveTypeId) {
+        case 1:
+            trainHead = smallTrain;
+            trainScale = 0.18;
+            cartFollowingDistance = 25;
+            break;
+    
+        case 2:
+            trainHead = medTrain;
+            trainScale = 0.2;
+            cartFollowingDistance = 30;
+            break;
+        
+        case 3:
+            trainHead = largeTrain;
+            trainScale = 0.22;
+            cartFollowingDistance = 43;
+            break;
+    }
 
+    cartsBought = [];
+
+    for (let index = 0; index < trainsInfo.numCargoCars; index++) {
+        cartsBought.push(cargoCart);
+    }
+
+    for (let index = 0; index < trainsInfo.numFuelCars; index++) {
+        cartsBought.push(fuelCart);
+    }
+
+    for (let index = 0; index < trainsInfo.numPassengerCars; index++) {
+        cartsBought.push(passangerCart);
+    }
 
 }
 
@@ -474,12 +509,9 @@ function eventLoop(timeStamp:number)
     
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawGame();
-    // console.log(timeStamp);
     if(!gameDone)
     {
-        // window.setTimeout(eventLoop, intervalTime); 
         window.requestAnimationFrame(eventLoop);
-
     }
  
 }
