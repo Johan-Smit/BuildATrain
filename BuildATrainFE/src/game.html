@@ -8,7 +8,7 @@
     <script src="scripts/game.js" async defer></script>
   </head>
   <body>
-    <main>
+    <main class="game-page">
 
       <section class="info-bar">
         <figure class="info-graphic">
@@ -82,15 +82,15 @@
           <button type="button" class="btn-game" onclick="deleteTrain()">Delete Train</button>
         </article>
         <article class="purchase panel">
-          <label>Purchase a new Train</label>
-          <select class="btn-game" name="locomotiveType" id="train-select">
+          <label for="locomotiveType">Purchase a new Train:</label>
+          <select class="btn-game" name="locomotiveType" id="train-type-select">
             <option>Small</option>
             <option>Medium</option>
             <option>Large</option>
           </select>
-          <label>Train name:</label>
-          <input type="text" name="locomotiveName">
-          <button type="button" class="btn-game wide-button">Purchase</button>
+          <label for="locomotiveName">Train name:</label>
+          <input type="text" name="locomotiveName" id="locomotiveName">
+          <button type="button" class="btn-game wide-button" onclick="purchaseTrain()" disabled>Purchase</button>
         </article>
       </section>
     </main>

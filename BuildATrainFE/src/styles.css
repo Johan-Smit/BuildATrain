@@ -49,6 +49,10 @@ body, html {
   transition: background 0.3s ease;
 }
 
+.btn-login:hover {
+  background: rgba(42, 117, 243, 0.7);
+}
+
 .btn-game {
   display: inline-block;
   background: rgba(66, 133, 244, 1);
@@ -58,8 +62,13 @@ body, html {
   border-radius: 5px;
 }
 
-.btn-login:hover {
-  background: rgba(42, 117, 243, 0.7);
+.btn-game:disabled {
+  display: inline-block;
+  background: rgba(66, 133, 244, 1);
+  color: #555;
+  padding: 10px 20px;
+  text-decoration: none;
+  border-radius: 5px;
 }
 
 .game-grid {
@@ -68,8 +77,9 @@ body, html {
 }
 
 .game-controls {
-  width: 100%;
-  display: flex;
+  width: 90%;
+  display: grid;
+  grid-template-columns: 2fr 2fr 2fr 3fr 3fr;
   margin-top: auto;
   justify-content: center;
   flex-wrap: wrap;
@@ -86,8 +96,8 @@ body, html {
 }
 
 .info-graphic img {
-  width: 50px;
-  height: 50px;
+  width: 30px;
+  height: 30px;
 }
 
 .info-graphic figcaption{
@@ -103,9 +113,17 @@ body, html {
   border: 2px solid black;
 }
 
+.game-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .game-stats {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  width: 90%;
+  justify-self: center;
 
   @media screen and (min-width: 780px) {
     grid-template-columns: 1fr 1fr 1fr 1fr;
@@ -119,8 +137,8 @@ body, html {
 }
 
 .game-stats img{
-  width: 50px;
-  height: 50px;
+  width: 30px;
+  height: 30px;
 }
 
 .game-stats figcaption{
