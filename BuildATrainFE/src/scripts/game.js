@@ -45,7 +45,18 @@ function changeSelected(newTrainName) {
 
 function selectTrain(){
   trainName = document.getElementById('train-select').selectedOptions[0].innerText;
-  updateTrain(game.trains.find((train) => { train.locomotiveName === trainName}));
+  let x;
+  
+  for (let i=0; i<game.trains.length; i++) {
+    if (game.trains[i].locomotiveName == trainName) {
+      x = game.trains[i];
+      break;
+    }
+  }
+
+  console.log(x);
+
+  updateTrain(x);
 }
 
 async function loadGame(){
@@ -66,6 +77,8 @@ async function loadGame(){
       subscribeToSSE();
 
       game = await response.json();
+
+      trainName = game.trains[0].locomotiveName
 
       const trainList = document.getElementById('train-select');
 
@@ -224,9 +237,34 @@ async function purchaseTrain(){
       if (myJSON.trains) {
         game.trains = myJSON.trains;
       }
+
+      let x;
+  
+  for (let i=0; i<game.trains.length; i++) {
+    if (game.trains[i].locomotiveName == trainName) {
+      x = game.trains[i];
+      break;
+    }
+  }
+
+  console.log(x);
+
+  updateTrain(x);
+      changeSelected(locomotiveName);
     }
 
-    updateTrain(game.trains.find((train) => train.locomotiveName === locomotiveName));
+    let x;
+  
+  for (let i=0; i<game.trains.length; i++) {
+    if (game.trains[i].locomotiveName == trainName) {
+      x = game.trains[i];
+      break;
+    }
+  }
+
+  console.log(x);
+
+  updateTrain(x);
 
     const trainList = document.getElementById('train-select');
     trainList.options.length = 0;
@@ -248,7 +286,7 @@ async function purchaseTrain(){
 async function deleteTrain(){
   try{
 
-    const response = await fetch(`${apiHost}/remove/train`, {
+    const response = await fetch(`${apiHost}/game/remove/train`, {
       method: 'DELETE',
       mode: 'cors',
       headers: {
@@ -289,7 +327,7 @@ async function deleteTrain(){
 async function deletePassenger(){
   try{
 
-    const response = await fetch(`${apiHost}/remove/car`, {
+    const response = await fetch(`${apiHost}/game/remove/car`, {
       method: 'DELETE',
       mode: 'cors',
       headers: {
@@ -321,7 +359,7 @@ async function deletePassenger(){
 async function deleteCargo(){
   try{
 
-    const response = await fetch(`${apiHost}/remove/car`, {
+    const response = await fetch(`${apiHost}/game/remove/car`, {
       method: 'DELETE',
       mode: 'cors',
       headers: {
@@ -353,7 +391,7 @@ async function deleteCargo(){
 async function deleteFuel(){
   try{
 
-    const response = await fetch(`${apiHost}/remove/car`, {
+    const response = await fetch(`${apiHost}/game/remove/car`, {
       method: 'DELETE',
       mode: 'cors',
       headers: {

@@ -23,12 +23,19 @@ namespace BuildATrain.Services
 
         protected async Task SendSSEEventAsync(Guid clientGuid, List<string> data, string Id = "", string Type = "")
         {
-            await _eventsService.GetClient(clientGuid).SendEventAsync(new ServerSentEvent
+            try
             {
-                Id = Id,
-                Type = Type,
-                Data = data
-            });
+                await _eventsService.GetClient(clientGuid).SendEventAsync(new ServerSentEvent
+                {
+                    Id = Id,
+                    Type = Type,
+                    Data = data
+                });
+            }
+            catch (Exception ex)
+            {
+
+            }
         }
 
         protected async Task SendSSEEventAsync()
