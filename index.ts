@@ -40,7 +40,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-      callbackURL: 'http://localhost:4000/auth/google/callback',
+      callbackURL: 'https://buk52nm6i2.us-east-1.awsapprunner.com/auth/google/callback',
     },
     (accessToken: string, refreshToken: any, profile: Profile, done: (error: any, user?: any, info?: any) => void) => {
       const user = {
